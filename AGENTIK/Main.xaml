@@ -1,0 +1,36 @@
+﻿<Window x:Class="Agent24.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:taskbarNotification="clr-namespace:Agent24.TaskbarNotification;assembly=Agent24.TaskbarNotification"
+        x:Name="Main"
+        Width="267"
+        Height="104"
+        ShowInTaskbar="False"
+        Visibility="Hidden"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+
+        <!--  the ToolTipText property is bound to the TextBox below  -->
+        <taskbarNotification:TaskbarIcon x:Name="MyNotifyIcon"
+                                         IconSource="/Icons/Error.ico"
+                                         ToolTipText="Мой Секретарь"
+                                         TrayMouseDoubleClick="MyNotifyIcon_OnTrayMouseDoubleClick">
+            <taskbarNotification:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Click="OnLoginClick" Header="Login" />
+                    <MenuItem Click="OnLogoutClick"
+                              Header="Logout"
+                              IsEnabled="{Binding IsLogin}" />
+                    <Separator />
+                    <MenuItem Click="OnRefreshClick"
+                              Header="Обновить"
+                              IsEnabled="{Binding Path=IsLogin,
+                                                  ElementName=Main,
+                                                  Mode=Default}" />
+                    <Separator />
+                    <MenuItem Click="OnExitClick" Header="Выход" />
+                </ContextMenu>
+            </taskbarNotification:TaskbarIcon.ContextMenu>
+        </taskbarNotification:TaskbarIcon>
+    </Grid>
+</Window>

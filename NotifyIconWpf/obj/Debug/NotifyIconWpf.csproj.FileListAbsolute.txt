@@ -1,0 +1,7 @@
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\bin\Debug\Agent24.TaskbarNotification.dll
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\bin\Debug\Agent24.TaskbarNotification.pdb
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\obj\Debug\Agent24.TaskbarNotification.g.resources
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\obj\Debug\Agent24.TaskbarNotification.Properties.Resources.resources
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\obj\Debug\NotifyIconWpf.csproj.GenerateResource.Cache
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\obj\Debug\Agent24.TaskbarNotification.dll
+C:\Users\Denis\Desktop\wpf-notifyicon\NotifyIconWpf\obj\Debug\Agent24.TaskbarNotification.pdb
