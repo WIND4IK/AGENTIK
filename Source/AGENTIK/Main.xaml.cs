@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using AGENTIK;
 using Clerk;
 
 namespace Agent24
@@ -33,9 +37,11 @@ namespace Agent24
 
         private bool _isLogin;
 
+        private TrayIcon trayIcon = new TrayIcon();
+
         public bool IsLogin
         {
-            get { return false/*(bool)GetValue(IsLoginProperty)*/; }
+            get { return _isLogin; }
         }
 
         public MainWindow()
@@ -228,11 +234,6 @@ namespace Agent24
             }
         }
 
-        private void OnRefreshClick(object sender, RoutedEventArgs e)
-        {
-            RefreshData();
-        }
-
         private void RefreshData()
         {
             try
@@ -256,12 +257,93 @@ namespace Agent24
 
                     _treeViewSource.Add(maitTicket);
                 }
+                RefreshIcon();
             }
             catch (Exception)
             {
 
             }
+        }
 
+        private void RefreshIcon()
+        {
+            try
+            {
+                trayIcon.ItemCounter = _tickets.Count;
+                trayIcon.ItemCounterVisibility = Visibility.Visible;
+                MyNotifyIcon.IconSource = CreateImage();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private BitmapImage CreateImage()
+        {
+            Matrix m = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformToDevice;
+            Point dpi = m.Transform(new Point(32, 32));
+
+            bool measureValid = trayIcon.IsMeasureValid;
+
+            if (!measureValid)
+            {
+                var size = new Size(32, 32);
+                trayIcon.Measure(size);
+                trayIcon.Arrange(new Rect(size));
+            }
+
+            var bmp = new RenderTargetBitmap((int)trayIcon.RenderSize.Width, (int)trayIcon.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
+
+            // this is waiting for dispatcher to perform measure, arrange and render passes
+            trayIcon.Dispatcher.Invoke(((Action)(() => { })), DispatcherPriority.Background);
+
+            bmp.Render(trayIcon);
+
+            return ConvertToBitmap(bmp);
+
+        }
+
+        private BitmapImage ConvertToBitmap(RenderTargetBitmap renderTargetBitmap)
+        {
+            try
+            {
+                var bitmapImage = new BitmapImage();
+                var bitmapEncoder = new BmpBitmapEncoder();
+                bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+
+                using (var stream = new MemoryStream())
+                {
+                    bitmapEncoder.Save(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    bitmapImage.BeginInit();
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.StreamSource = stream;
+                    bitmapImage.EndInit();
+                }
+                return bitmapImage;
+            }
+            catch (Exception)
+            {
+                
+            }
+            return null;
+        }
+
+        private void LogoutOnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            Logout();
+        }
+
+        private void OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = IsLogin;
+            e.Handled = true;
+        }
+
+        private void RefreshOnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            RefreshData();
         }
     }
 }

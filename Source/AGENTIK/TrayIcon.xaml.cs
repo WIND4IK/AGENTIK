@@ -20,6 +20,24 @@ namespace AGENTIK
     /// </summary>
     public partial class TrayIcon : UserControl
     {
+        public static readonly DependencyProperty ItemCounterProperty =
+            DependencyProperty.Register("ItemCounter", typeof (int), typeof (TrayIcon), new PropertyMetadata(default(int)));
+
+        public int ItemCounter
+        {
+            get { return (int) GetValue(ItemCounterProperty); }
+            set { SetValue(ItemCounterProperty, value); }
+        }
+
+        public static readonly DependencyProperty ItemCounterVisibilityProperty =
+            DependencyProperty.Register("ItemCounterVisibility", typeof (Visibility), typeof (TrayIcon), new PropertyMetadata(default(Visibility)));
+
+        public Visibility ItemCounterVisibility
+        {
+            get { return (Visibility) GetValue(ItemCounterVisibilityProperty); }
+            set { SetValue(ItemCounterVisibilityProperty, value); }
+        }
+
         public TrayIcon()
         {
             InitializeComponent();

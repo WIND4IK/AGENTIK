@@ -4,8 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-            
+             d:DesignHeight="32" d:DesignWidth="32">
+    <UserControl.Background>
+        <ImageBrush ImageSource="Icons/NetDrives.ico"/>
+    </UserControl.Background>
+    <Grid Width="20" Height="20" Visibility="{Binding ItemCounterVisibility, RelativeSource={RelativeSource Self}}" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+        <Ellipse Fill="#66FF0000"
+                         Stroke="White"
+                         StrokeThickness="2" />
+
+        <TextBlock Height="16"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           Text="{Binding ItemCounter, RelativeSource={RelativeSource Self}}"
+                           TextAlignment="Center">
+            <TextBlock.Effect>
+                <DropShadowEffect ShadowDepth="0" />
+            </TextBlock.Effect>
+        </TextBlock>
     </Grid>
 </UserControl>
