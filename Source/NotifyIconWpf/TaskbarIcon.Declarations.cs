@@ -25,6 +25,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -192,7 +193,35 @@ namespace Agent24.TaskbarNotification
       }
     }
 
+      public static readonly DependencyProperty IconStreamProperty =
+          DependencyProperty.Register("IconStream", typeof(Stream), typeof(TaskbarIcon), new FrameworkPropertyMetadata(null, IconStreamPropertyChanged));
 
+      public Stream IconStream
+      {
+          get { return (Stream) GetValue(IconStreamProperty); }
+          set { SetValue(IconStreamProperty, value); }
+      }
+
+      private static void IconStreamPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+      {
+          TaskbarIcon owner = (TaskbarIcon)d;
+          owner.OnIconStreamPropertyChanged(e);
+      }
+
+      private void OnIconStreamPropertyChanged(DependencyPropertyChangedEventArgs e)
+      {
+          Stream newValue = (Stream)e.NewValue;
+
+          //resolving the ImageSource at design time is unlikely to work
+          if (!Util.IsDesignMode)
+          {
+              var bmp = new Bitmap(newValue);
+
+              IntPtr Hicon = bmp.GetHicon();
+
+              Icon = Icon.FromHandle(Hicon);
+          }
+      }
     /// <summary>
     /// Resolves an image source and updates the <see cref="Icon" /> property accordingly.
     /// </summary>

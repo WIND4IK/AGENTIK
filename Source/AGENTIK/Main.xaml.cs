@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Net;
 using System.Net.Http;
+using System.Resources;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,27 +17,42 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using AGENTIK;
-using Clerk;
+using Agent24;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
-namespace Agent24
+namespace AGENTIK
 {
+
     /// <summary>
     /// Interaction logic for BalloonSampleWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static ResourceManager resourceMan;
+        public static ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    resourceMan = new ResourceManager("XamlPropertyReference.Properties.Resources", typeof(MainWindow).Assembly);
+                }
+                return resourceMan;
+            }
+        }
+
         private readonly Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
 
         private static CookieContainer _cookieContainer;
 
-        private FancyBalloon _balloon;
+        private readonly ObservableCollection<ViewTicket> _treeViewSource;
 
-        private readonly List<ViewTicket> _treeViewSource;
-
-        private List<Ticket> _tickets;
+        private ObservableCollection<Ticket> _tickets;
 
         private bool _isLogin;
+
+        private bool _isClose;
 
         private TrayIcon trayIcon = new TrayIcon();
 
@@ -50,18 +67,22 @@ namespace Agent24
 
             _cookieContainer = new CookieContainer();
 
-            _treeViewSource = new List<ViewTicket>();
+            _treeViewSource = new ObservableCollection<ViewTicket>();
 
-            _tickets = new List<Ticket>();
+            _tickets = new ObservableCollection<Ticket>();
 
             _isLogin = false;
+
+            _treeView.ItemsSource = _treeViewSource;
+            _listViewPriority.ItemsSource = _tickets;
+            _listViewStatus.ItemsSource = _tickets;
         }
 
         private async Task<bool> Login(string login, string password)
         {
             try
             {
-                using (var handler = new HttpClientHandler() {CookieContainer = _cookieContainer, UseCookies = true})
+                using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true})
                 {
                     using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
                     {
@@ -92,7 +113,7 @@ namespace Agent24
         {
             try
             {
-                using (var handler = new HttpClientHandler() {CookieContainer = _cookieContainer, UseCookies = true})
+                using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true})
                 {
                     using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
                     {
@@ -118,22 +139,33 @@ namespace Agent24
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            //clean up notifyicon (would otherwise stay open until application finishes)
-            MyNotifyIcon.Dispose();
+            if (_isClose)
+            {
+                //clean up notifyicon (would otherwise stay open until application finishes)
+                MyNotifyIcon.Dispose();
 
-            base.OnClosing(e);
+                base.OnClosing(e);
+            }
+            else
+            {
+                ShowInTaskbar = false;
+                Visibility = Visibility.Hidden;
+                e.Cancel = true;
+            }
         }
 
         private void MyNotifyIcon_OnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            _balloon = new FancyBalloon();
-            _balloon.BalloonText = "Мой Секретарь";
-            _balloon.TreeViewSource = _treeViewSource;
-            _balloon.ListViewPrioritySource = _tickets.OrderBy(t => t.PriorityId);
-            _balloon.ListViewStatusSource = _tickets.OrderBy(t => t.StatusId);
+            //_balloon = new FancyBalloon();
+            //_balloon.BalloonText = "Мой Секретарь";
+            //_balloon.TreeViewSource = _treeViewSource;
+            //_balloon.ListViewPrioritySource = _tickets.OrderBy(t => t.PriorityId);
+            //_balloon.ListViewStatusSource = _tickets.OrderBy(t => t.StatusId);
 
-            //show balloon and close it after 4 seconds
-            MyNotifyIcon.ShowCustomBalloon(_balloon, PopupAnimation.Slide, 4000);
+            ////show balloon and close it after 4 seconds
+            //MyNotifyIcon.ShowCustomBalloon(_balloon, PopupAnimation.Slide, 4000);
+            Show();
+            ShowInTaskbar = true;
         }
 
         private void OnLoginClick(object sender, RoutedEventArgs e)
@@ -172,7 +204,7 @@ namespace Agent24
                     dispatcherTimer.Tick += Callback;
                     dispatcherTimer.Interval = new TimeSpan(0, 5, 0);
                     dispatcherTimer.Start();
-                    MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/NetDrives.ico"));
+                    //MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/NetDrives.ico"));
                     Cursor = Cursors.Arrow;
                 }
             }
@@ -182,22 +214,10 @@ namespace Agent24
             }
         }
 
-        private void OnLogoutClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                _isLogin = !Logout().Result;
-                MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/Error.ico"));
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Ошибка при Logout!", "Ошибка!", MessageBoxButton.OK);
-            }
-        }
-
         private void OnExitClick(object sender, RoutedEventArgs e)
         {
             _isLogin = !Logout().Result;
+            _isClose = true;
             Close();
         }
 
@@ -206,7 +226,7 @@ namespace Agent24
             RefreshData();
         }
 
-        private async Task<List<Ticket>> GetTickets()
+        private async Task<ObservableCollection<Ticket>> GetTickets()
         {
             try
             {
@@ -224,13 +244,13 @@ namespace Agent24
                         var elements = document.Root.Elements().ToArray();
                         var tickets = elements.Select(element => (Ticket) serializer.Deserialize(element.CreateReader())).ToList();
 
-                        return tickets;
+                        return new ObservableCollection<Ticket>(tickets);
                     }
                 }
             }
             catch (Exception e)
             {
-                return new List<Ticket>();
+                return new ObservableCollection<Ticket>();
             }
         }
 
@@ -238,8 +258,11 @@ namespace Agent24
         {
             try
             {
-                _tickets = GetTickets().Result;
+                _tickets.Clear();
                 _treeViewSource.Clear();
+
+                foreach (var ticket in GetTickets().Result)
+                    _tickets.Add(ticket);
 
                 var contractors = _tickets.Select(t => new { ID = t.Contractor, Name = t.NameContractor }).ToList();
                 foreach (var contractor in contractors)
@@ -257,7 +280,11 @@ namespace Agent24
 
                     _treeViewSource.Add(maitTicket);
                 }
+
                 RefreshIcon();
+                var mediaPlayer = new MediaPlayer();
+                mediaPlayer.Open(new Uri("/Sounds/sound.mp3", UriKind.Relative));
+                mediaPlayer.Play();
             }
             catch (Exception)
             {
@@ -271,17 +298,18 @@ namespace Agent24
             {
                 trayIcon.ItemCounter = _tickets.Count;
                 trayIcon.ItemCounterVisibility = Visibility.Visible;
-                MyNotifyIcon.IconSource = CreateImage();
+                var stream = CreateImage();
+                MyNotifyIcon.IconStream = stream;
             }
             catch (Exception)
             {
             }
         }
 
-        private BitmapImage CreateImage()
+        private Stream CreateImage()
         {
             Matrix m = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformToDevice;
-            Point dpi = m.Transform(new Point(32, 32));
+            Point dpi = m.Transform(new Point(96, 96));
 
             bool measureValid = trayIcon.IsMeasureValid;
 
@@ -300,28 +328,21 @@ namespace Agent24
             bmp.Render(trayIcon);
 
             return ConvertToBitmap(bmp);
-
         }
 
-        private BitmapImage ConvertToBitmap(RenderTargetBitmap renderTargetBitmap)
+        private Stream ConvertToBitmap(RenderTargetBitmap renderTargetBitmap)
         {
             try
             {
-                var bitmapImage = new BitmapImage();
-                var bitmapEncoder = new BmpBitmapEncoder();
+
+                var bitmapEncoder = new PngBitmapEncoder();
                 bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
 
-                using (var stream = new MemoryStream())
-                {
-                    bitmapEncoder.Save(stream);
-                    stream.Seek(0, SeekOrigin.Begin);
+                var stream = new MemoryStream();
+                bitmapEncoder.Save(stream);
+                stream.Seek(0, SeekOrigin.Begin);
 
-                    bitmapImage.BeginInit();
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.StreamSource = stream;
-                    bitmapImage.EndInit();
-                }
-                return bitmapImage;
+                return stream;
             }
             catch (Exception)
             {
@@ -332,7 +353,8 @@ namespace Agent24
 
         private void LogoutOnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            Logout();
+            _isLogin = !Logout().Result;
+            MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/Error.ico"));
         }
 
         private void OnCanExecute(object sender, CanExecuteRoutedEventArgs e)

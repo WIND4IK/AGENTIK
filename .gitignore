@@ -3,3 +3,14 @@
 .git/Source/UpgradeLog.htm
 .git/Source/Changelog.txt
 .git/Source/UpgradeLog.XML
+Source/_UpgradeReport_Files/UpgradeLog.htm
+Source/_UpgradeReport_Files/UpgradeReport.css
+Source/_UpgradeReport_Files/UpgradeReport.xslt
+Source/_UpgradeReport_Files/UpgradeReport_Error.png
+Source/_UpgradeReport_Files/UpgradeReport_Information.png
+Source/_UpgradeReport_Files/UpgradeReport_Success.png
+Source/_UpgradeReport_Files/UpgradeReport_Warning.png
+Source/AGENTIK.suo
+Source/AGENTIK.v11.suo
+.git/Source/AGENTIK/bin
+.git/Source/AGENTIK/obj
