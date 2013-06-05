@@ -273,6 +273,8 @@
     <Resource Include="Images\Refresh.png" />
     <Resource Include="Images\Settings.png" />
     <Resource Include="Images\Tree.png" />
+    <Resource Include="Images\TimerB.png" />
+    <Resource Include="Images\TimerG.png" />
     <Content Include="Sounds\sound.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

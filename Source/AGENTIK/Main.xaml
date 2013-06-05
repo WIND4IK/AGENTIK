@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:agentik="clr-namespace:AGENTIK"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:tbn="clr-namespace:AGENTIK.TaskbarNotification;assembly=AGENTIK.TaskbarNotification"
@@ -13,7 +14,7 @@
         SizeToContent="Height"
         Visibility="Visible"
         WindowStartupLocation="CenterScreen"
-        mc:Ignorable="d">
+        mc:Ignorable="d" FontFamily="Verdana">
 
     <Window.Resources>
         <DataTemplate x:Key="OverlayIcon">
@@ -369,6 +370,269 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="TreeViewItemFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Fill" Color="#FF595959" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Stroke" Color="#FF262626" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#FF27C7F7" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Fill" Color="#FFCCEEFB" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#FF1CC4F7" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#FF82DFFB" />
+        <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Fill" Color="#FFFFFFFF" />
+        <SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Stroke" Color="#FF818181" />
+        <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Width="16"
+                                Height="16"
+                                Background="Transparent"
+                                Padding="5,5,5,5">
+                            <Path x:Name="ExpandPath"
+                                  Data="{StaticResource TreeArrow}"
+                                  Fill="{StaticResource TreeViewItem.TreeArrow.Static.Fill}"
+                                  Stroke="{StaticResource TreeViewItem.TreeArrow.Static.Stroke}">
+                                <Path.RenderTransform>
+                                    <RotateTransform Angle="135" CenterX="3" CenterY="3" />
+                                </Path.RenderTransform>
+                            </Path>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ExpandPath" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="180" CenterX="3" CenterY="3" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="ExpandPath" Property="Fill" Value="{StaticResource TreeViewItem.TreeArrow.Static.Checked.Fill}" />
+                                <Setter TargetName="ExpandPath" Property="Stroke" Value="{StaticResource TreeViewItem.TreeArrow.Static.Checked.Stroke}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ExpandPath" Property="Stroke" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Stroke}" />
+                                <Setter TargetName="ExpandPath" Property="Fill" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Fill}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="ExpandPath" Property="Stroke" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Checked.Stroke}" />
+                                <Setter TargetName="ExpandPath" Property="Fill" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Checked.Fill}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate x:Key="TreeViewItemInternalDataTemplate">
+            <Grid x:Name="grid">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="StatusVisualStateGroup">
+                        <VisualState x:Name="New">
+                            <Storyboard>
+                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rectangle" Storyboard.TargetProperty="(Fill)">
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="#FF5AC467" />
+                                </ObjectAnimationUsingKeyFrames>
+                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="bmpTimer" Storyboard.TargetProperty="(BitmapImage.UriSource)">
+                                    <DiscreteObjectKeyFrame KeyTime="0" Value="/Images/TimerG.png" />
+                                </ObjectAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </VisualState>
+                        <VisualState x:Name="NotNew" >
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="22" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="22" />
+                    <ColumnDefinition Width="12" />
+                </Grid.ColumnDefinitions>
+                <i:Interaction.Behaviors>
+                    <ei:DataStateBehavior Binding="{Binding IsNew}"
+                                          FalseState="NotNew"
+                                          TrueState="New"
+                                          Value="True" />
+                </i:Interaction.Behaviors>
+				<Rectangle x:Name="rectangle" Fill="#FF3D3D3D" Margin="3"/>
+                <TextBlock x:Name="textBlock" Grid.Column="1" VerticalAlignment="Center">
+                    <Hyperlink NavigateUri="{Binding Ticket.Uri}">
+                        <i:Interaction.Behaviors>
+                            <agentik:HyperlinkNavigationBehavior />
+                        </i:Interaction.Behaviors>
+                        <Run Text="{Binding Title}" ToolTip="{Binding Title}" />
+                    </Hyperlink>
+                </TextBlock>
+                <Button Grid.Column="2"
+                        Background="{x:Null}"
+                        BorderBrush="{x:Null}">
+                    <Image x:Name="timerImage"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch">
+                        <Image.Source>
+                            <BitmapImage x:Name="bmpTimer" UriSource="/Images/TimerB.png" />
+                        </Image.Source>
+                    </Image>
+                </Button>
+            </Grid>
+        </DataTemplate>
+        <ItemsPanelTemplate x:Key="TreeViewItemsPanelTemplate">
+            <StackPanel IsItemsHost="True" />
+        </ItemsPanelTemplate>
+        <HierarchicalDataTemplate x:Key="TreeViewItemDataTemplate"
+                                  ItemTemplate="{StaticResource TreeViewItemInternalDataTemplate}"
+                                  ItemsSource="{Binding Children}">
+            <Grid Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="36" />
+                    <ColumnDefinition Width="36" />
+                    <ColumnDefinition Width="36" />
+                    <ColumnDefinition Width="16" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="36" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Border Margin="3,5"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="WhiteSmoke"
+                        BorderBrush="#FFB2B2B2"
+                        BorderThickness="1"
+                        CornerRadius="2">
+                    <TextBlock HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="18.667"
+                               Text="{Binding Count}"
+                               TextWrapping="Wrap" />
+                </Border>
+                <TextBlock Grid.Column="1"
+                           Grid.ColumnSpan="1"
+                           Margin="5,0,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="18.667"
+                           Text="{Binding Title}" />
+                <Button Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{x:Null}"
+                        BorderBrush="{x:Null}">
+                    <Image Source="Images/Plus.png" />
+                </Button>
+                <Button Grid.Column="3"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{x:Null}"
+                        BorderBrush="{x:Null}" Margin="3">
+                    <Image Source="Images/Tree.png" />
+                </Button>
+                <Button Grid.Column="4"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Background="{x:Null}"
+                        BorderBrush="{x:Null}"
+                        Padding="0">
+                    <Image Source="Images/Eye.png" Margin="3" />
+                </Button>
+            </Grid>
+        </HierarchicalDataTemplate>
+        <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+            <Setter Property="Padding" Value="1,0,0,0" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="22" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="80" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <ToggleButton x:Name="Expander"
+                                          Grid.ColumnSpan="2"
+                                          ClickMode="Press"
+                                          IsChecked="{Binding IsExpanded,
+                                                              RelativeSource={RelativeSource TemplatedParent}}"
+                                          Style="{StaticResource ExpandCollapseToggleStyle}" />
+                            <Border x:Name="Bd"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}"
+                                    SnapsToDevicePixels="true">
+                                <ContentPresenter x:Name="PART_Header"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  ContentSource="Header"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Grid.ColumnSpan="2" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="true" />
+                                    <Condition Property="IsSelectionActive" Value="false" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}" />
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}}" />
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Window.TaskbarItemInfo>
@@ -446,48 +710,54 @@
                 <Border Background="#FFB4B4B4"
                         BorderBrush="#FF997137"
                         BorderThickness="1,1,1,1">
-                    <TabControl Margin="5,5,5,5"
-                                Background="#FFEFEFEF"
-                                Style="{DynamicResource TabControlStyle}">
+                    <TabControl Background="#FFEFEFEF" Style="{DynamicResource TabControlStyle}">
                         <TabItem IsSelected="True" Style="{DynamicResource TabItemStyle}">
                             <TabItem.Header>
-                                <TextBlock Background="{x:Null}">По клиентам</TextBlock>
+                                <TextBlock Background="{x:Null}"><Run Text="По клиентам" />
+                                </TextBlock>
                             </TabItem.Header>
                             <TreeView x:Name="_treeView"
-                                      Margin="5,5,5,5"
+                                      Margin="-5,-5,-4,0"
                                       HorizontalContentAlignment="Stretch"
                                       VerticalContentAlignment="Stretch"
                                       Background="{x:Null}"
                                       BorderBrush="#00000000"
                                       Foreground="White"
+                                      ItemContainerStyle="{DynamicResource TreeViewItemStyle}"
+                                      ItemTemplate="{DynamicResource TreeViewItemDataTemplate}"
+                                      ItemsPanel="{DynamicResource TreeViewItemsPanelTemplate}"
+                                      ItemsSource="{Binding Mode=OneWay}"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                       d:DataContext="{d:DesignData Source=TreeViewSampleData.xaml}">
-                                <TreeView.ItemTemplate>
+                                <!--
+                                    <TreeView.ItemTemplate>
                                     <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                        <TextBlock FontSize="16"
-                                                   FontWeight="Bold"
-                                                   Text="{Binding Title}"
-                                                   ToolTip="{Binding Title}" />
-                                        <HierarchicalDataTemplate.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock>
-                                                    <Hyperlink NavigateUri="{Binding Ticket.Uri}">
-                                                        <i:Interaction.Behaviors>
-                                                            <agentik:HyperlinkNavigationBehavior />
-                                                        </i:Interaction.Behaviors>
-                                                        <Run Text="{Binding Title}" ToolTip="{Binding Title}" />
-                                                    </Hyperlink>
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </HierarchicalDataTemplate.ItemTemplate>
-
+                                    <TextBlock FontSize="16"
+                                    FontWeight="Bold"
+                                    Text="{Binding Title}"
+                                    ToolTip="{Binding Title}" />
+                                    <HierarchicalDataTemplate.ItemTemplate>
+                                    <DataTemplate>
+                                    <TextBlock>
+                                    <Hyperlink NavigateUri="{Binding Ticket.Uri}">
+                                    <i:Interaction.Behaviors>
+                                    <agentik:HyperlinkNavigationBehavior />
+                                    </i:Interaction.Behaviors>
+                                    <Run Text="{Binding Title}" ToolTip="{Binding Title}" />
+                                    </Hyperlink>
+                                    </TextBlock>
+                                    </DataTemplate>
+                                    </HierarchicalDataTemplate.ItemTemplate>
+                                    
                                     </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
+                                    </TreeView.ItemTemplate>
+                                -->
                             </TreeView>
                         </TabItem>
                         <TabItem Style="{DynamicResource TabItemStyle}">
                             <TabItem.Header>
-                                <TextBlock Background="{x:Null}">По приоритетам</TextBlock>
+                                <TextBlock Background="{x:Null}"><Run Text="По приоритетам" />
+                                </TextBlock>
                             </TabItem.Header>
                             <ListView x:Name="_listViewPriority"
                                       Background="{x:Null}"
@@ -498,8 +768,7 @@
                                             <Hyperlink NavigateUri="{Binding Uri}">
                                                 <i:Interaction.Behaviors>
                                                     <agentik:HyperlinkNavigationBehavior />
-                                                </i:Interaction.Behaviors>
-                                                <Run Text="{Binding Theme, Mode=OneWay}" ToolTip="{Binding Theme}" />
+                                                </i:Interaction.Behaviors><Run Text="{Binding Theme, Mode=OneWay}" ToolTip="{Binding Theme}" />
                                             </Hyperlink>
                                         </TextBlock>
                                     </DataTemplate>
@@ -508,7 +777,8 @@
                         </TabItem>
                         <TabItem Style="{DynamicResource TabItemStyle}">
                             <TabItem.Header>
-                                <TextBlock Background="{x:Null}">По сложности</TextBlock>
+                                <TextBlock Background="{x:Null}"><Run Text="По сложности" />
+                                </TextBlock>
                             </TabItem.Header>
                             <ListView x:Name="_listViewStatus"
                                       Background="{x:Null}"
@@ -519,8 +789,7 @@
                                             <Hyperlink NavigateUri="{Binding Uri}">
                                                 <i:Interaction.Behaviors>
                                                     <agentik:HyperlinkNavigationBehavior />
-                                                </i:Interaction.Behaviors>
-                                                <Run Text="{Binding Theme, Mode=OneWay}" ToolTip="{Binding Theme}" />
+                                                </i:Interaction.Behaviors><Run Text="{Binding Theme, Mode=OneWay}" ToolTip="{Binding Theme}" />
                                             </Hyperlink>
                                         </TextBlock>
                                     </DataTemplate>

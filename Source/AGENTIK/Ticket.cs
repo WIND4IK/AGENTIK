@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
@@ -19,18 +20,27 @@ namespace AGENTIK
         public ViewTicket(Ticket ticket)
         {
             _ticket = ticket;
-            Children = new List<ViewTicket>();
+            Children = new ObservableCollection<ViewTicket>();
         }
         public Ticket Ticket
         {
             get { return _ticket; }
         }
 
+        public bool IsNew
+        {
+
+            get { return true; }
+            set { }
+        }
+
+        public int Count { get; set; }
+
         public Uri Uri { get; set; }
 
         public string Title { get; set; }
 
-        public List<ViewTicket> Children { get; set; }
+        public ObservableCollection<ViewTicket> Children { get; set; }
     }
 
     [XmlRoot("row")]
