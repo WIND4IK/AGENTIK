@@ -1,6 +1,6 @@
 ﻿
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Event flags for clicked events.

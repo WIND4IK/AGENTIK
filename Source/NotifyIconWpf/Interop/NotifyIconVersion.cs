@@ -1,5 +1,5 @@
 ﻿
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// The notify icon version that is used. The higher

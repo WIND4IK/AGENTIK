@@ -1,0 +1,32 @@
+﻿<objectModel:ObservableCollection xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                  xmlns:agentik="clr-namespace:AGENTIK"
+                                  xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System"
+                                  x:TypeArguments="agentik:ViewTicket">
+
+    <agentik:ViewTicket Title="Название организации1">
+        <agentik:ViewTicket.Children>
+            <agentik:ViewTicket Title="Название1" />
+            <agentik:ViewTicket Title="Название2" />
+            <agentik:ViewTicket Title="Название3" />
+            <agentik:ViewTicket Title="Название4" />
+        </agentik:ViewTicket.Children>
+    </agentik:ViewTicket>
+    <agentik:ViewTicket Title="Название организации2">
+        <agentik:ViewTicket.Children>
+            <agentik:ViewTicket Title="Название1" />
+            <agentik:ViewTicket Title="Название2" />
+            <agentik:ViewTicket Title="Название3" />
+            <agentik:ViewTicket Title="Название4" />
+        </agentik:ViewTicket.Children>
+    </agentik:ViewTicket>
+    <agentik:ViewTicket Title="Название организации3">
+        <agentik:ViewTicket.Children>
+            <agentik:ViewTicket Title="Название1" />
+            <agentik:ViewTicket Title="Название2" />
+            <agentik:ViewTicket Title="Название3" />
+            <agentik:ViewTicket Title="Название4" />
+        </agentik:ViewTicket.Children>
+    </agentik:ViewTicket>
+
+</objectModel:ObservableCollection>

@@ -31,9 +31,9 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using Agent24.TaskbarNotification.Interop;
+using AGENTIK.TaskbarNotification.Interop;
 
-namespace Agent24.TaskbarNotification
+namespace AGENTIK.TaskbarNotification
 {
   /// <summary>
   /// Contains declarations of WPF dependency properties

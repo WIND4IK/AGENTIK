@@ -65,6 +65,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <DesignData Include="TreeViewSampleData.xaml">
+      <SubType>Designer</SubType>
+    </DesignData>
     <Reference Include="Accessibility" />
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json">
@@ -263,6 +266,13 @@
     <Resource Include="Images\ico_new_messages.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Eye.png" />
+    <Resource Include="Images\Home.png" />
+    <Resource Include="Images\People.png" />
+    <Resource Include="Images\Plus.png" />
+    <Resource Include="Images\Refresh.png" />
+    <Resource Include="Images\Settings.png" />
+    <Resource Include="Images\Tree.png" />
     <Content Include="Sounds\sound.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

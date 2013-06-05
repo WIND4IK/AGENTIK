@@ -1,5 +1,5 @@
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Main operations performed on the

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Win32 API imports.

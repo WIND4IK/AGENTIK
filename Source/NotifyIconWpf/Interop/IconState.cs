@@ -1,4 +1,4 @@
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// The state of the icon - can be set to

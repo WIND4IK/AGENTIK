@@ -22,7 +22,7 @@
 // THIS COPYRIGHT NOTICE MAY NOT BE REMOVED FROM THIS FILE
 
 
-namespace Agent24.TaskbarNotification
+namespace AGENTIK.TaskbarNotification
 {
   ///<summary>
   /// Supported icons for the tray's balloon messages.

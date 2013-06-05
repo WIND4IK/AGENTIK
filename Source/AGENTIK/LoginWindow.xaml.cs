@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Agent24
+namespace AGENTIK
 {
     /// <summary>
     /// Interaction logic for LoginWindow.xaml

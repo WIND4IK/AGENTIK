@@ -4,9 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using Agent24.TaskbarNotification;
+using AGENTIK.TaskbarNotification;
 
-namespace Agent24
+namespace AGENTIK
 {
     /// <summary>
     /// Interaction logic for FancyBalloon.xaml

@@ -32,10 +32,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using System.Windows.Threading;
-using Agent24.TaskbarNotification.Interop;
-using Point = Agent24.TaskbarNotification.Interop.Point;
+using AGENTIK.TaskbarNotification.Interop;
+using Point = AGENTIK.TaskbarNotification.Interop.Point;
 
-namespace Agent24.TaskbarNotification
+namespace AGENTIK.TaskbarNotification
 {
   /// <summary>
   /// A WPF proxy to for a taskbar icon (NotifyIcon) that sits in the system's

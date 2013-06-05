@@ -26,7 +26,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Receives messages from the taskbar icon through

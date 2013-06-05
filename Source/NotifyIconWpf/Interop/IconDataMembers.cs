@@ -1,6 +1,6 @@
 using System;
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Indicates which members of a <see cref="NotifyIconData"/> structure

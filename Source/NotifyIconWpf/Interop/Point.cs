@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Win API struct providing coordinates for a single point.

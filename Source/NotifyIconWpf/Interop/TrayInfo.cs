@@ -4,7 +4,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Resolves the current tray position.

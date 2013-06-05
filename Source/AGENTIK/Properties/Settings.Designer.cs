@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Agent24.Properties {
+namespace AGENTIK.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

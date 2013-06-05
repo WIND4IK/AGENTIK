@@ -17,7 +17,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using Agent24;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
@@ -29,18 +28,6 @@ namespace AGENTIK
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static ResourceManager resourceMan;
-        public static ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
-                    resourceMan = new ResourceManager("XamlPropertyReference.Properties.Resources", typeof(MainWindow).Assembly);
-                }
-                return resourceMan;
-            }
-        }
 
         private readonly Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
 

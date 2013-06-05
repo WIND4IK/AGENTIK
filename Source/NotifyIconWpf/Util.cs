@@ -30,9 +30,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Resources;
 using System.Windows.Threading;
-using Agent24.TaskbarNotification.Interop;
+using AGENTIK.TaskbarNotification.Interop;
 
-namespace Agent24.TaskbarNotification
+namespace AGENTIK.TaskbarNotification
 {
   /// <summary>
   /// Util and extension methods.

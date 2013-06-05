@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// A struct that is submitted in order to configure
@@ -67,7 +67,7 @@ namespace Agent24.TaskbarNotification.Interop
 
     /// <summary>
     /// A value that specifies which bits of the state member are retrieved or modified.
-    /// For example, setting this member to <see cref="Agent24.TaskbarNotification.Interop.IconState.Hidden"/>
+    /// For example, setting this member to <see cref="AGENTIK.TaskbarNotification.Interop.IconState.Hidden"/>
     /// causes only the item's hidden
     /// state to be retrieved.
     /// </summary>
@@ -109,7 +109,7 @@ namespace Agent24.TaskbarNotification.Interop
     /// <summary>
     /// Windows Vista (Shell32.dll version 6.0.6) and later. The handle of a customized
     /// balloon icon provided by the application that should be used independently
-    /// of the tray icon. If this member is non-NULL and the <see cref="Agent24.TaskbarNotification.Interop.BalloonFlags.User"/>
+    /// of the tray icon. If this member is non-NULL and the <see cref="AGENTIK.TaskbarNotification.Interop.BalloonFlags.User"/>
     /// flag is set, this icon is used as the balloon icon.<br/>
     /// If this member is NULL, the legacy behavior is carried out.
     /// </summary>

@@ -5,11 +5,16 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-namespace Agent24
+namespace AGENTIK
 {
     public class ViewTicket
     {
         private readonly Ticket _ticket;
+
+        public ViewTicket()
+        {
+            
+        }
 
         public ViewTicket(Ticket ticket)
         {
@@ -31,6 +36,11 @@ namespace Agent24
     [XmlRoot("row")]
     public class Ticket : IEquatable<Ticket>, IXmlSerializable
     {
+        public Ticket()
+        {
+            
+        }
+
         public int Id { get; internal set; }
 
         public int Contractor { get; internal set; }

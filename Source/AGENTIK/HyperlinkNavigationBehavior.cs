@@ -2,7 +2,7 @@
 using System.Windows.Documents;
 using System.Windows.Interactivity;
 
-namespace Agent24
+namespace AGENTIK
 {
     public class HyperlinkNavigationBehavior : Behavior<Hyperlink>
     {

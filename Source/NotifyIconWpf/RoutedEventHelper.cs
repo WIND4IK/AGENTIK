@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace Agent24.TaskbarNotification
+namespace AGENTIK.TaskbarNotification
 {
   /// <summary>
   /// Helper class used by routed events of the

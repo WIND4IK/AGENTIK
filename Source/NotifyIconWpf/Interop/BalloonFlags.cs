@@ -1,4 +1,4 @@
-namespace Agent24.TaskbarNotification.Interop
+namespace AGENTIK.TaskbarNotification.Interop
 {
   /// <summary>
   /// Flags that define the icon that is shown on a balloon
