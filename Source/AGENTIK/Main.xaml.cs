@@ -29,7 +29,10 @@ namespace AGENTIK
     public partial class MainWindow : Window
     {
 
-        private readonly Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
+        private Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
+        private Uri _logoutUri = new Uri("http://skylogic.mysecretar.com/mys/logout");
+        private Uri _dataUri = new Uri("http://skylogic.mysecretar.com/mys/xml");
+        private TimeSpan _interval = new TimeSpan(0, 5, 0);
 
         private static CookieContainer _cookieContainer;
 
@@ -104,14 +107,12 @@ namespace AGENTIK
                 {
                     using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
                     {
-                        var baseAddress = new Uri("http://skylogic.mysecretar.com/mys/logout");
-
                         var requestMessage = new HttpRequestMessage();
                         requestMessage.Method = HttpMethod.Get;
                         HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
                         response.EnsureSuccessStatusCode();
 
-                        var responseCookies = _cookieContainer.GetCookies(baseAddress);
+                        var responseCookies = _cookieContainer.GetCookies(_logoutUri);
 
                         return responseCookies.Count == 3;
                     }
@@ -157,16 +158,6 @@ namespace AGENTIK
 
         private void OnLoginClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var loginWindow = new LoginWindow();
-                loginWindow.Closed += OnLoginWindowClosed;
-                loginWindow.ShowDialog();
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Ошибка при Login!", "Ошибка!", MessageBoxButton.OK);
-            }
         }
 
         void OnLoginWindowClosed(object sender, EventArgs e)
@@ -189,7 +180,7 @@ namespace AGENTIK
                     RefreshData();
                     var dispatcherTimer = new DispatcherTimer();
                     dispatcherTimer.Tick += Callback;
-                    dispatcherTimer.Interval = new TimeSpan(0, 5, 0);
+                    dispatcherTimer.Interval = _interval;
                     dispatcherTimer.Start();
                     //MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/NetDrives.ico"));
                     Cursor = Cursors.Arrow;
@@ -221,11 +212,7 @@ namespace AGENTIK
                 {
                     using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
                     {
-
-                        string url = String.Format("http://skylogic.mysecretar.com/mys/xml");
-                        var address = new Uri(url);
-
-                        Stream stream = await client.GetStreamAsync(address).ConfigureAwait(false);
+                        Stream stream = await client.GetStreamAsync(_dataUri).ConfigureAwait(false);
                         XDocument document = XDocument.Load(stream);
                         var serializer = new XmlSerializer(typeof (Ticket));
                         var elements = document.Root.Elements().ToArray();
@@ -255,7 +242,7 @@ namespace AGENTIK
                 foreach (var contractor in contractors)
                 {
                     var maitTicket = new ViewTicket(null);
-                    maitTicket.Title = String.Format("({1}){0}", contractor.Name, _tickets.Count(t => t.Contractor == contractor.ID));
+                    maitTicket.Title = contractor.Name;
 
                     foreach (var ticket in _tickets.Where(t => t.Contractor == contractor.ID))
                     {
@@ -269,9 +256,7 @@ namespace AGENTIK
                 }
 
                 RefreshIcon();
-                var mediaPlayer = new MediaPlayer();
-                mediaPlayer.Open(new Uri("/Sounds/sound.mp3", UriKind.Relative));
-                mediaPlayer.Play();
+                mediaElement.Play();
             }
             catch (Exception)
             {
@@ -353,6 +338,56 @@ namespace AGENTIK
         private void RefreshOnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             RefreshData();
+        }
+
+        private void OnLoginCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
+        }
+
+        private void LoginOnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                var loginWindow = new LoginWindow();
+                loginWindow.Closed += OnLoginWindowClosed;
+                loginWindow.ShowDialog();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Ошибка при Login!", "Ошибка!", MessageBoxButton.OK);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+        	RefreshData();
+        }
+
+        private void OnSettingsButtonClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var settingsWindow = new SettingsWindow();
+                settingsWindow.Owner = this;
+                settingsWindow.ShowDialog();
+
+                if (settingsWindow.DialogResult != null && (bool) settingsWindow.DialogResult)
+                {
+                    if(settingsWindow.LoginAddress.Length > 0)
+                        _baseAddress = new Uri(settingsWindow.LoginAddress);
+                    if(settingsWindow.LogoutAddtess.Length > 0)
+                        _logoutUri = new Uri(settingsWindow.LogoutAddtess);
+                    if(settingsWindow.DataAddress.Length > 0)
+                        _dataUri = new Uri(settingsWindow.DataAddress);
+                    _interval = settingsWindow.RefreshTime.TimeOfDay;
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
         }
     }
 }

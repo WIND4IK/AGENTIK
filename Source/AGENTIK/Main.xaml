@@ -9,9 +9,10 @@
         xmlns:s="clr-namespace:System;assembly=mscorlib"
         xmlns:tbn="clr-namespace:AGENTIK.TaskbarNotification;assembly=AGENTIK.TaskbarNotification"
         x:Name="Main"
-        Width="550"
-        Height="285"
-        MinHeight="400"
+        Title="AGENTIK"
+        Width="431"
+        Height="250"
+        MinHeight="250"
         FontFamily="Verdana"
         SizeToContent="Height"
         Visibility="Visible"
@@ -41,6 +42,8 @@
 
         <RoutedUICommand x:Key="LogoutCommand" Text="Logout" />
         <RoutedUICommand x:Key="RefreshCommand" Text="Обновить" />
+        <RoutedUICommand x:Key="LoginCommand" Text="Logout" />
+
         <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF" />
         <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC" />
 
@@ -81,22 +84,23 @@
                                                   ContentSource="SelectedContent"
                                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Border>
-                            <Grid Margin="2,2,2,0">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
+
                                 <Button Grid.Column="0"
                                         Width="60"
                                         Height="25"
                                         Margin="8,0"
-                                        VerticalAlignment="Bottom">
+                                        VerticalAlignment="Bottom"
+                                        Click="Button_Click">
                                     <Image Source="/Images/Refresh.png" />
                                 </Button>
                                 <TabPanel x:Name="headerPanel"
                                           Grid.Row="0"
                                           Grid.Column="1"
-                                          Margin="0,0,0,-1"
                                           Panel.ZIndex="1"
                                           Background="Transparent"
                                           IsItemsHost="true"
@@ -181,21 +185,20 @@
                         <Grid x:Name="templateRoot"
                               Width="110"
                               Height="24"
-                              Margin="0"
                               HorizontalAlignment="Stretch"
                               SnapsToDevicePixels="true">
                             <Border x:Name="mainBorder"
                                     Width="100"
-                                    Margin="0,0,0,-1"
+                                    Margin="0,0,0,-2"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1,1,1,0"
-                                    CornerRadius="5,5,0,0">
+                                    CornerRadius="10,10,0,0">
                                 <Border x:Name="innerBorder"
                                         Background="#FFF1F1F1"
                                         BorderBrush="{StaticResource TabItem.Selected.Border}"
                                         BorderThickness="1,1,1,0"
-                                        CornerRadius="5,5,0,0"
+                                        CornerRadius="10,10,0,0"
                                         Opacity="0" />
                             </Border>
                             <ContentPresenter x:Name="contentPresenter"
@@ -366,7 +369,8 @@
                                     <Condition Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" Value="Top" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Panel.ZIndex" Value="1" />
-                                <Setter Property="Margin" Value="-3,-3,-3,0" />
+                                <Setter TargetName="contentPresenter" Property="TextBlock.FontWeight" Value="Bold" />
+                                <Setter TargetName="mainBorder" Property="Margin" Value="-2,-2,-2,-2" />
                                 <Setter TargetName="innerBorder" Property="Opacity" Value="1" />
                                 <Setter TargetName="innerBorder" Property="BorderThickness" Value="1,1,1,0" />
                                 <Setter TargetName="mainBorder" Property="BorderThickness" Value="1,1,1,0" />
@@ -443,59 +447,12 @@
         </Style>
         <DataTemplate x:Key="TreeViewItemInternalDataTemplate">
             <Grid x:Name="grid">
-                <i:Interaction.Triggers>
-                    <ei:DataTrigger Binding="{Binding IsNew}">
-                        <ei:DataTrigger.Value>0</ei:DataTrigger.Value>
-                        <ei:GoToStateAction StateName="NotNew" />
-                    </ei:DataTrigger>
-                    <ei:DataTrigger Binding="{Binding IsNew}">
-                        <ei:DataTrigger.Value>1</ei:DataTrigger.Value>
-                        <ei:GoToStateAction StateName="New" />
-                    </ei:DataTrigger>
-                </i:Interaction.Triggers>
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup x:Name="StatusVisualStateGroup">
-                        <VisualState x:Name="New">
-                            <Storyboard>
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="rectangle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
-                                    <EasingColorKeyFrame KeyTime="0" Value="#FF5AC467" />
-                                </ColorAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="timerImageG" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="timerImageB" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                    <EasingDoubleKeyFrame KeyTime="0" Value="0" />
-                                </DoubleAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="NotNew">
-                            <Storyboard>
-                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="rectangle" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
-                                    <EasingColorKeyFrame KeyTime="0" Value="#FF3D3D3D" />
-                                </ColorAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="timerImageB" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                    <EasingDoubleKeyFrame KeyTime="0" Value="1" />
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="timerImageG" Storyboard.TargetProperty="(UIElement.Opacity)">
-                                    <EasingDoubleKeyFrame KeyTime="0" Value="0" />
-                                </DoubleAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="22" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="22" />
                     <ColumnDefinition Width="12" />
                 </Grid.ColumnDefinitions>
-                <i:Interaction.Behaviors>
-                    <ei:DataStateBehavior Binding="{Binding IsNew}"
-                                          FalseState="NotNew"
-                                          TrueState="New">
-                        <ei:DataStateBehavior.Value>1</ei:DataStateBehavior.Value>
-                    </ei:DataStateBehavior>
-                </i:Interaction.Behaviors>
                 <Rectangle x:Name="rectangle"
                            Margin="3"
                            Fill="#FF3D3D3D" />
@@ -523,10 +480,21 @@
                                VerticalAlignment="Stretch"
                                Opacity="1"
                                Source="/Images/TimerG.png" />
-
                     </Grid>
                 </Button>
             </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Path=IsNew}" Value="True">
+                    <Setter TargetName="rectangle" Property="Fill" Value="#FF5AC467" />
+                    <Setter TargetName="timerImageG" Property="Opacity" Value="1" />
+                    <Setter TargetName="timerImageB" Property="Opacity" Value="0" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=IsNew}" Value="False">
+                    <Setter TargetName="rectangle" Property="Fill" Value="#FF3D3D3D" />
+                    <Setter TargetName="timerImageG" Property="Opacity" Value="0" />
+                    <Setter TargetName="timerImageB" Property="Opacity" Value="1" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
         <ItemsPanelTemplate x:Key="TreeViewItemsPanelTemplate">
             <StackPanel IsItemsHost="True" />
@@ -572,8 +540,9 @@
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
                             Background="{x:Null}"
-                            BorderBrush="{x:Null}">
-                        <Image Source="Images/Plus.png" />
+                            BorderBrush="{x:Null}"
+                            Padding="3">
+                        <Image Source="Images/PlusB.png" />
                     </Button>
                     <Button Grid.Column="3"
                             HorizontalAlignment="Stretch"
@@ -982,14 +951,13 @@
                         <CommandBinding CanExecute="OnCanExecute"
                                         Command="{StaticResource LogoutCommand}"
                                         Executed="LogoutOnExecuted" />
-                        <CommandBinding CanExecute="OnCanExecute"
-                                        Command="{StaticResource RefreshCommand}"
-                                        Executed="RefreshOnExecuted" />
+                        <CommandBinding CanExecute="OnLoginCanExecute"
+                                        Command="{StaticResource LoginCommand}"
+                                        Executed="LoginOnExecuted" />
+
                     </ContextMenu.CommandBindings>
-                    <MenuItem Click="OnLoginClick" Header="Login" />
+                    <MenuItem Command="{StaticResource LoginCommand}" Header="Login" />
                     <MenuItem Command="{StaticResource LogoutCommand}" Header="Logout" />
-                    <Separator />
-                    <MenuItem Command="{StaticResource RefreshCommand}" Header="Обновить" />
                     <Separator />
                     <MenuItem Click="OnExitClick" Header="Выход" />
                 </ContextMenu>
@@ -1005,6 +973,15 @@
                         BorderBrush="Black"
                         BorderThickness="0, 0, 0, 1">
                     <Grid>
+                        <Grid.CommandBindings>
+                            <CommandBinding CanExecute="OnLoginCanExecute"
+                                            Command="{StaticResource LoginCommand}"
+                                            Executed="LoginOnExecuted" />
+                            <CommandBinding CanExecute="OnCanExecute"
+                                            Command="{StaticResource RefreshCommand}"
+                                            Executed="RefreshOnExecuted" />
+                        </Grid.CommandBindings>
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="21" />
                             <ColumnDefinition Width="32" />
@@ -1031,7 +1008,8 @@
                         </Button>
                         <Button Grid.Column="5"
                                 Background="{x:Null}"
-                                BorderBrush="{x:Null}">
+                                BorderBrush="{x:Null}"
+                                Click="OnSettingsButtonClick">
                             <Image Source="Images/Settings.png" />
                         </Button>
                     </Grid>
@@ -1042,9 +1020,12 @@
                         BorderBrush="#FF997137"
                         BorderThickness="1,1,1,1">
                     <TabControl Background="#FFEFEFEF" Style="{DynamicResource TabControlStyle}">
-                        <TabItem IsSelected="True" Style="{DynamicResource TabItemStyle}">
+                        <TabItem FontSize="13.333"
+                                 IsSelected="True"
+                                 Padding="6,0"
+                                 Style="{DynamicResource TabItemStyle}">
                             <TabItem.Header>
-                                <TextBlock Background="{x:Null}"><Run Text="Задания" />
+                                <TextBlock Background="{x:Null}" TextBlock.FontWeight="{Binding}"><Run Text="Задания" />
                                 </TextBlock>
                             </TabItem.Header>
                             <TabControl HorizontalContentAlignment="Stretch"
@@ -1170,5 +1151,15 @@
                 </Border>
             </Grid>
         </Grid>
+        <MediaElement x:Name="mediaElement"
+                      Width="100"
+                      Height="100"
+                      Margin="-143,175,0,0"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      LoadedBehavior="Manual"
+                      Source="Sounds/sound.mp3"
+                      Volume="100" />
+
     </Grid>
 </Window>

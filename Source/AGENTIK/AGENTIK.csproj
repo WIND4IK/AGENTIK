@@ -46,6 +46,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -275,6 +276,7 @@
     <Resource Include="Images\Tree.png" />
     <Resource Include="Images\TimerB.png" />
     <Resource Include="Images\TimerG.png" />
+    <Resource Include="Images\PlusB.png" />
     <Content Include="Sounds\sound.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

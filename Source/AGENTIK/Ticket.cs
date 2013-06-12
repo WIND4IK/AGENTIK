@@ -27,10 +27,10 @@ namespace AGENTIK
             get { return _ticket; }
         }
 
-        public string IsNew
+        public bool IsNew
         {
 
-            get { return 1.ToString(); }
+            get { return true; }
         }
 
         public int Count { get { return Children.Count; } }
