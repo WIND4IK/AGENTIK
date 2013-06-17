@@ -4,6 +4,7 @@
         xmlns:agentik="clr-namespace:AGENTIK"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:huddled="http://schemas.huddledmasses.org/wpf"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:s="clr-namespace:System;assembly=mscorlib"
@@ -20,6 +21,7 @@
         mc:Ignorable="d">
 
     <Window.Resources>
+
         <DataTemplate x:Key="OverlayIcon">
             <Grid Width="20" Height="20">
                 <Ellipse Fill="Red"
@@ -95,7 +97,7 @@
                                         Height="25"
                                         Margin="8,0"
                                         VerticalAlignment="Bottom"
-                                        Click="Button_Click">
+                                        Click="ButtonClick">
                                     <Image Source="/Images/Refresh.png" />
                                 </Button>
                                 <TabPanel x:Name="headerPanel"
@@ -525,7 +527,7 @@
                             CornerRadius="2">
                         <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   FontSize="18.667"
+                                   FontSize="14.667"
                                    Text="{Binding Count}"
                                    TextWrapping="Wrap" />
                     </Border>
@@ -533,7 +535,7 @@
                                Grid.ColumnSpan="1"
                                Margin="5,0,0,0"
                                VerticalAlignment="Center"
-                               FontSize="18.667"
+                               FontSize="17.333"
                                Text="{Binding Title}"
                                ToolTip="{Binding Title}" />
                     <Button Grid.Column="2"
@@ -541,7 +543,7 @@
                             VerticalAlignment="Stretch"
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
-                            Padding="3">
+                            Padding="6">
                         <Image Source="Images/PlusB.png" />
                     </Button>
                     <Button Grid.Column="3"
@@ -549,7 +551,7 @@
                             VerticalAlignment="Stretch"
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
-                            Padding="3">
+                            Padding="6">
                         <Image Source="Images/Tree.png" />
                     </Button>
                     <Button Grid.Column="4"
@@ -558,7 +560,7 @@
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
                             Padding="0">
-                        <Image Margin="3" Source="Images/Eye.png" />
+                        <Image Source="Images/Eye.png" />
                     </Button>
                 </Grid>
             </Border>
@@ -938,6 +940,12 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
+
+    <i:Interaction.Behaviors>
+        <huddled:SnapToBehavior SnapDistance="20" />
+        <agentik:MaximizeBehavior />
+    </i:Interaction.Behaviors>
+
     <Grid>
 
         <!--  the ToolTipText property is bound to the TextBox below  -->
@@ -993,7 +1001,8 @@
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="1"
                                 Background="{x:Null}"
-                                BorderBrush="{x:Null}">
+                                BorderBrush="{x:Null}"
+                                Padding="3">
                             <Image Source="Images/Home.png" />
                         </Button>
                         <Button Grid.Column="3"
@@ -1003,13 +1012,15 @@
                         </Button>
                         <Button Grid.Column="4"
                                 Background="{x:Null}"
-                                BorderBrush="{x:Null}">
+                                BorderBrush="{x:Null}"
+                                Padding="3">
                             <Image Source="Images/Plus.png" />
                         </Button>
                         <Button Grid.Column="5"
                                 Background="{x:Null}"
                                 BorderBrush="{x:Null}"
-                                Click="OnSettingsButtonClick">
+                                Click="OnSettingsButtonClick"
+                                Padding="3">
                             <Image Source="Images/Settings.png" />
                         </Button>
                     </Grid>
@@ -1162,4 +1173,5 @@
                       Volume="100" />
 
     </Grid>
+
 </Window>

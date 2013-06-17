@@ -46,6 +46,8 @@ namespace AGENTIK
 
         private TrayIcon trayIcon = new TrayIcon();
 
+        private LoginWindow _loginWindow;
+
         public bool IsLogin
         {
             get { return _isLogin; }
@@ -66,6 +68,17 @@ namespace AGENTIK
             _treeView.ItemsSource = _treeViewSource;
             _listViewPriority.ItemsSource = _tickets;
             _listViewStatus.ItemsSource = _tickets;
+        }
+
+        private void FillHeight()
+        {
+            PropertyChangedCallback tmpChanged = (source, args) =>
+                {
+                    var workArea = (Rect)args.NewValue;
+                    this.Height = workArea.Height;
+                }; 
+            DependencyProperty tmp = DependencyProperty.Register("tmp", typeof (Rect), typeof (Window), new PropertyMetadata(tmpChanged)); 
+            this.SetResourceReference(tmp, SystemParameters.WorkAreaKey);
         }
 
         private async Task<bool> Login(string login, string password)
@@ -124,7 +137,6 @@ namespace AGENTIK
             }
         }
 
-
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             if (_isClose)
@@ -152,44 +164,16 @@ namespace AGENTIK
 
             ////show balloon and close it after 4 seconds
             //MyNotifyIcon.ShowCustomBalloon(_balloon, PopupAnimation.Slide, 4000);
-            Show();
-            ShowInTaskbar = true;
-        }
-
-        private void OnLoginClick(object sender, RoutedEventArgs e)
-        {
-        }
-
-        void OnLoginWindowClosed(object sender, EventArgs e)
-        {
-            try
+            if (Visibility == Visibility.Hidden)
             {
-                Cursor = Cursors.Wait;
-                var loginWindow = (LoginWindow) sender;
-                _isLogin = Login(loginWindow.Login, loginWindow.Password).Result;
-                if (!_isLogin)
-                {
-                    Cursor = Cursors.Arrow;
-                    if (MessageBox.Show("Неверный логин или пароль!", "Внимание!", MessageBoxButton.OK) == MessageBoxResult.OK)
-                    {
-                        //loginWindow.ShowDialog();
-                    }
-                }
-                else
-                {
-                    RefreshData();
-                    var dispatcherTimer = new DispatcherTimer();
-                    dispatcherTimer.Tick += Callback;
-                    dispatcherTimer.Interval = _interval;
-                    dispatcherTimer.Start();
-                    //MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/NetDrives.ico"));
-                    Cursor = Cursors.Arrow;
-                }
+                Show();
+                ShowInTaskbar = true;
             }
-            catch (Exception)
+            else if (Visibility == Visibility.Visible)
             {
-                Cursor = Cursors.Arrow;
+                this.Activate();
             }
+            RefreshIcon(0, Visibility.Hidden);
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e)
@@ -255,7 +239,7 @@ namespace AGENTIK
                     _treeViewSource.Add(maitTicket);
                 }
 
-                RefreshIcon();
+                RefreshIcon(_tickets.Count, Visibility.Visible);
                 mediaElement.Play();
             }
             catch (Exception)
@@ -264,12 +248,12 @@ namespace AGENTIK
             }
         }
 
-        private void RefreshIcon()
+        private void RefreshIcon(int count, Visibility visibility)
         {
             try
             {
-                trayIcon.ItemCounter = _tickets.Count;
-                trayIcon.ItemCounterVisibility = Visibility.Visible;
+                trayIcon.ItemCounter = count;
+                trayIcon.ItemCounterVisibility = visibility;
                 var stream = CreateImage();
                 MyNotifyIcon.IconStream = stream;
             }
@@ -326,6 +310,10 @@ namespace AGENTIK
         private void LogoutOnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             _isLogin = !Logout().Result;
+
+            _tickets.Clear();
+            _treeViewSource.Clear();
+
             MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/Error.ico"));
         }
 
@@ -350,9 +338,10 @@ namespace AGENTIK
         {
             try
             {
-                var loginWindow = new LoginWindow();
-                loginWindow.Closed += OnLoginWindowClosed;
-                loginWindow.ShowDialog();
+                _loginWindow = new LoginWindow();
+                _loginWindow.btnLogin.Click += OnLoginButtonClick;
+                _loginWindow.PasswordBox.KeyUp += OnPasswordBoxKeyUp;
+                _loginWindow.ShowDialog();
             }
             catch (Exception)
             {
@@ -360,7 +349,47 @@ namespace AGENTIK
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void OnPasswordBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+                TryLogin();
+        }
+
+        void OnLoginButtonClick(object sender, RoutedEventArgs e)
+        {
+            TryLogin();
+        }
+
+        private void TryLogin()
+        {
+            try
+            {
+                _isLogin = Login(_loginWindow.Login, _loginWindow.Password).Result;
+                if (!_isLogin)
+                {
+                    MessageBox.Show("Неверный логин или пароль!", "Внимание!", MessageBoxButton.OK);
+                    _loginWindow.Password = String.Empty;
+                }
+                else
+                {
+                    RefreshData();
+                    var dispatcherTimer = new DispatcherTimer();
+                    dispatcherTimer.Tick += Callback;
+                    dispatcherTimer.Interval = _interval;
+                    dispatcherTimer.Start();
+
+                    if(_loginWindow.Remember)
+                        _loginWindow.Save();
+                    _loginWindow.Close();
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+        }
+
+        private void ButtonClick(object sender, RoutedEventArgs e)
         {
         	RefreshData();
         }
