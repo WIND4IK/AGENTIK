@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AGENTIK.Controls.AutoCompleteTextBox;
 
 namespace AGENTIK
 {
@@ -50,7 +52,21 @@ namespace AGENTIK
 
             _isolatedStorageFile = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly | IsolatedStorageScope.Domain, null, null);
 
-            Load();
+            Prepare();
+        }
+
+        private void Prepare()
+        {
+            try
+            {
+                Load();
+                foreach (var pair in _dictionary)
+                    txtBoxUserName.AddItem(new AutoCompleteEntry(pair.Key, pair.Key));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Runtime Error:" + ex.Message);
+            }
         }
 
         public void Save()
@@ -111,11 +127,19 @@ namespace AGENTIK
             {
                 if (_dictionary.ContainsKey(txtBoxUserName.Text))
                     passwordBox.Password = _dictionary[txtBoxUserName.Text];
+                SetSelection(passwordBox, passwordBox.Password.Length, 0);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
+
+        private void SetSelection(PasswordBox passwordBox, int start, int length)
+        {
+            passwordBox.GetType()
+                       .GetMethod("Select", BindingFlags.Instance | BindingFlags.NonPublic)
+                       .Invoke(passwordBox, new object[] { start, length });
+        } 
     }
 }

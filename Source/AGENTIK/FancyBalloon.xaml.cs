@@ -21,18 +21,6 @@ namespace AGENTIK
             set { _treeView.ItemsSource = value; }
         }
 
-        public IEnumerable ListViewPrioritySource
-        {
-            get { return _listViewPriority.ItemsSource; }
-            set { _listViewPriority.ItemsSource = value; }
-        }
-
-        public IEnumerable ListViewStatusSource
-        {
-            get { return _listViewStatus.ItemsSource; }
-            set { _listViewStatus.ItemsSource = value; }
-        }
-
         #region BalloonText dependency property
 
         /// <summary>

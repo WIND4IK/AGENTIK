@@ -58,6 +58,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Page Include="Controls\AutoCompleteTextBox\AutoCompleteTextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -72,6 +76,9 @@
     <Reference Include="Accessibility" />
     <Reference Include="Huddled.Interop">
       <HintPath>..\libs\Huddled.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\libs\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json">
@@ -169,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\AutoCompleteTextBox\AutoCompleteEntry.cs" />
+    <Compile Include="Controls\AutoCompleteTextBox\AutoCompleteTextBox.xaml.cs">
+      <DependentUpon>AutoCompleteTextBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HyperlinkNavigationBehavior.cs" />
     <Compile Include="MaximizeBehavior.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
@@ -223,6 +234,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -282,7 +296,9 @@
     <Resource Include="Images\TimerG.png" />
     <Resource Include="Images\PlusB.png" />
     <Resource Include="Images\SettingsB.png" />
-    <Content Include="Sounds\sound.mp3" />
+    <Content Include="Sounds\sound.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

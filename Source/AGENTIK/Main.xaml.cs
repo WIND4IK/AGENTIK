@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Media;
 using System.Net;
 using System.Net.Http;
-using System.Resources;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -17,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using log4net;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
@@ -28,6 +27,7 @@ namespace AGENTIK
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ILog _log = LogManager.GetLogger(typeof(MainWindow));
 
         private Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
         private Uri _logoutUri = new Uri("http://skylogic.mysecretar.com/mys/logout");
@@ -38,13 +38,13 @@ namespace AGENTIK
 
         private readonly ObservableCollection<ViewTicket> _treeViewSource;
 
-        private ObservableCollection<Ticket> _tickets;
+        private readonly ObservableCollection<Ticket> _tickets;
 
         private bool _isLogin;
 
         private bool _isClose;
 
-        private TrayIcon trayIcon = new TrayIcon();
+        private readonly TrayIcon _trayIcon = new TrayIcon();
 
         private LoginWindow _loginWindow;
 
@@ -68,17 +68,14 @@ namespace AGENTIK
             _treeView.ItemsSource = _treeViewSource;
             _listViewPriority.ItemsSource = _tickets;
             _listViewStatus.ItemsSource = _tickets;
+
+            Loaded += OnMainWindowLoaded;
         }
 
-        private void FillHeight()
+        void OnMainWindowLoaded(object sender, RoutedEventArgs e)
         {
-            PropertyChangedCallback tmpChanged = (source, args) =>
-                {
-                    var workArea = (Rect)args.NewValue;
-                    this.Height = workArea.Height;
-                }; 
-            DependencyProperty tmp = DependencyProperty.Register("tmp", typeof (Rect), typeof (Window), new PropertyMetadata(tmpChanged)); 
-            this.SetResourceReference(tmp, SystemParameters.WorkAreaKey);
+            Left = SystemParameters.WorkArea.Width - ActualWidth;
+            Top = SystemParameters.WorkArea.Height - ActualHeight;
         }
 
         private async Task<bool> Login(string login, string password)
@@ -89,14 +86,15 @@ namespace AGENTIK
                 {
                     using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
                     {
-                        var content = new List<KeyValuePair<string, string>>();
-                        content.Add(new KeyValuePair<string, string>("login", login));
-                        content.Add(new KeyValuePair<string, string>("password", password));
-                        content.Add(new KeyValuePair<string, string>("remember_me", "on"));
-                        content.Add(new KeyValuePair<string, string>("loginCaptcha", ""));
+                        var content = new List<KeyValuePair<string, string>>
+                            {
+                                new KeyValuePair<string, string>("login", login), 
+                                new KeyValuePair<string, string>("password", password), 
+                                new KeyValuePair<string, string>("remember_me", "on"), 
+                                new KeyValuePair<string, string>("loginCaptcha", "")
+                            };
 
-                        var requestMessage = new HttpRequestMessage(HttpMethod.Post, _baseAddress);
-                        requestMessage.Content = new FormUrlEncodedContent(content);
+                        var requestMessage = new HttpRequestMessage(HttpMethod.Post, _baseAddress) {Content = new FormUrlEncodedContent(content)};
                         HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
                         response.EnsureSuccessStatusCode();
 
@@ -108,6 +106,7 @@ namespace AGENTIK
             }
             catch (HttpRequestException ex)
             {
+                _log.Error(ex.Message);
                 return false;
             }
         }
@@ -120,8 +119,7 @@ namespace AGENTIK
                 {
                     using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
                     {
-                        var requestMessage = new HttpRequestMessage();
-                        requestMessage.Method = HttpMethod.Get;
+                        var requestMessage = new HttpRequestMessage {Method = HttpMethod.Get};
                         HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
                         response.EnsureSuccessStatusCode();
 
@@ -133,6 +131,7 @@ namespace AGENTIK
             }
             catch (HttpRequestException ex)
             {
+                _log.Error(ex.Message);
                 return false;
             }
         }
@@ -154,7 +153,7 @@ namespace AGENTIK
             }
         }
 
-        private void MyNotifyIcon_OnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
+        private void MyNotifyIconOnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
             //_balloon = new FancyBalloon();
             //_balloon.BalloonText = "Мой Секретарь";
@@ -171,7 +170,7 @@ namespace AGENTIK
             }
             else if (Visibility == Visibility.Visible)
             {
-                this.Activate();
+                Activate();
             }
             RefreshIcon(0, Visibility.Hidden);
         }
@@ -206,8 +205,9 @@ namespace AGENTIK
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
+                _log.Error(ex.Message);
                 return new ObservableCollection<Ticket>();
             }
         }
@@ -239,12 +239,64 @@ namespace AGENTIK
                     _treeViewSource.Add(maitTicket);
                 }
 
+                ShowNotification();
                 RefreshIcon(_tickets.Count, Visibility.Visible);
+                var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(directory.FullName, "Sounds/sound.mp3");
+                mediaElement.Source = new Uri(path);
                 mediaElement.Play();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.Error(ex.Message);
+            }
+        }
 
+        private void ShowNotification()
+        {
+            try
+            {
+                var balloon = new FancyBalloon();
+                balloon.BalloonText = "Мой Секретарь";
+                balloon.TreeViewSource = _treeViewSource.Where(t => t.IsNew);
+                balloon.MouseLeftButtonUp += OnBalloonMouseLeftButtonUp;
+                balloon.MouseRightButtonUp += OnBalloonMouseRightButtonUp;
+
+                //show balloon and close it after 4 seconds
+                MyNotifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex.Message);
+            }
+        }
+
+        void OnBalloonMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                MyNotifyIcon.CloseBalloon();
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex.Message);
+            }
+        }
+
+        void OnBalloonMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (Visibility == Visibility.Hidden)
+                    Visibility = Visibility.Visible;
+                else
+                    Activate();
+                MyNotifyIcon.CloseBalloon();
+                RefreshIcon(0, Visibility.Hidden);
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex.Message);
             }
         }
 
@@ -252,13 +304,14 @@ namespace AGENTIK
         {
             try
             {
-                trayIcon.ItemCounter = count;
-                trayIcon.ItemCounterVisibility = visibility;
+                _trayIcon.ItemCounter = count;
+                _trayIcon.ItemCounterVisibility = visibility;
                 var stream = CreateImage();
                 MyNotifyIcon.IconStream = stream;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.Error(ex.Message);
             }
         }
 
@@ -267,21 +320,21 @@ namespace AGENTIK
             Matrix m = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformToDevice;
             Point dpi = m.Transform(new Point(96, 96));
 
-            bool measureValid = trayIcon.IsMeasureValid;
+            bool measureValid = _trayIcon.IsMeasureValid;
 
             if (!measureValid)
             {
                 var size = new Size(32, 32);
-                trayIcon.Measure(size);
-                trayIcon.Arrange(new Rect(size));
+                _trayIcon.Measure(size);
+                _trayIcon.Arrange(new Rect(size));
             }
 
-            var bmp = new RenderTargetBitmap((int)trayIcon.RenderSize.Width, (int)trayIcon.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
+            var bmp = new RenderTargetBitmap((int)_trayIcon.RenderSize.Width, (int)_trayIcon.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
 
             // this is waiting for dispatcher to perform measure, arrange and render passes
-            trayIcon.Dispatcher.Invoke(((Action)(() => { })), DispatcherPriority.Background);
+            _trayIcon.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
 
-            bmp.Render(trayIcon);
+            bmp.Render(_trayIcon);
 
             return ConvertToBitmap(bmp);
         }
@@ -300,9 +353,9 @@ namespace AGENTIK
 
                 return stream;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                _log.Error(ex.Message);
             }
             return null;
         }
@@ -343,8 +396,9 @@ namespace AGENTIK
                 _loginWindow.PasswordBox.KeyUp += OnPasswordBoxKeyUp;
                 _loginWindow.ShowDialog();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.Error(ex.Message);
                 MessageBox.Show("Ошибка при Login!", "Ошибка!", MessageBoxButton.OK);
             }
         }
@@ -383,8 +437,9 @@ namespace AGENTIK
                     _loginWindow.Close();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.Error(ex.Message);
             }
 
         }
@@ -413,9 +468,9 @@ namespace AGENTIK
                     _interval = settingsWindow.RefreshTime.TimeOfDay;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                _log.Error(ex.Message);
             }
         }
     }

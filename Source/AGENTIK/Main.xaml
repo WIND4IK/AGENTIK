@@ -17,7 +17,7 @@
         FontFamily="Verdana"
         SizeToContent="Height"
         Visibility="Visible"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         mc:Ignorable="d">
 
     <Window.Resources>
@@ -192,16 +192,29 @@
                             <Border x:Name="mainBorder"
                                     Width="100"
                                     Margin="0,0,0,-2"
-                                    Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1,1,1,0"
-                                    CornerRadius="10,10,0,0">
+                                    CornerRadius="5,5,0,0">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#FFF0F0F0" />
+                                        <GradientStop Offset="1" Color="#FFFCFCFC" />
+                                        <GradientStop Offset="0.5" Color="#FFF7F7F7" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <Border x:Name="innerBorder"
-                                        Background="#FFF1F1F1"
                                         BorderBrush="{StaticResource TabItem.Selected.Border}"
                                         BorderThickness="1,1,1,0"
-                                        CornerRadius="10,10,0,0"
-                                        Opacity="0" />
+                                        CornerRadius="5,5,0,0"
+                                        Opacity="0">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="1" Color="#FFF2F2F2" />
+                                            <GradientStop Color="#FFFCFCFC" />
+                                            <GradientStop Offset="0.5" Color="#FFF7F7F7" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
                             </Border>
                             <ContentPresenter x:Name="contentPresenter"
                                               Margin="{TemplateBinding Padding}"
@@ -505,7 +518,7 @@
                                   ItemTemplate="{StaticResource TreeViewItemInternalDataTemplate}"
                                   ItemsSource="{Binding Children}">
             <Border BorderBrush="#FF8F8F8F" BorderThickness="0,0,0,1">
-                <Grid Height="36" Background="White">
+                <Grid Height="Auto" Background="White">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40" />
                         <ColumnDefinition Width="*" />
@@ -515,7 +528,7 @@
                         <ColumnDefinition Width="16" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="36" />
+                        <RowDefinition Height="31" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Border Margin="3,5"
@@ -543,7 +556,7 @@
                             VerticalAlignment="Stretch"
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
-                            Padding="6">
+                            Padding="4">
                         <Image Source="Images/PlusB.png" />
                     </Button>
                     <Button Grid.Column="3"
@@ -551,7 +564,7 @@
                             VerticalAlignment="Stretch"
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
-                            Padding="6">
+                            Padding="4">
                         <Image Source="Images/Tree.png" />
                     </Button>
                     <Button Grid.Column="4"
@@ -952,7 +965,7 @@
         <tbn:TaskbarIcon x:Name="MyNotifyIcon"
                          IconSource="/Icons/Error.ico"
                          ToolTipText="Мой Секретарь"
-                         TrayMouseDoubleClick="MyNotifyIcon_OnTrayMouseDoubleClick">
+                         TrayMouseDoubleClick="MyNotifyIconOnTrayMouseDoubleClick">
             <tbn:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <ContextMenu.CommandBindings>
@@ -997,7 +1010,7 @@
                             <ColumnDefinition Width="32" />
                             <ColumnDefinition Width="32" />
                             <ColumnDefinition Width="32" />
-                            <ColumnDefinition Width="60" />
+                            <ColumnDefinition Width="32" />
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="1"
                                 Background="{x:Null}"
@@ -1041,7 +1054,7 @@
                             </TabItem.Header>
                             <TabControl HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch"
-                                        Background="#FFEFEFEF"
+                                        Background="#FFF0F0F0"
                                         BorderThickness="0"
                                         Padding="-2"
                                         Style="{DynamicResource TabControlInternalStyle}">
@@ -1050,7 +1063,10 @@
                                          IsSelected="True"
                                          Style="{DynamicResource TabItemInternalStyle}">
                                     <TabItem.Header>
-                                        <TextBlock Margin="5,0" Background="{x:Null}"><Run Text="По клиентам" />
+                                        <TextBlock Margin="5,0"
+                                                   VerticalAlignment="Center"
+                                                   Background="{x:Null}"
+                                                   FontSize="12"><Run Text="По клиентам" />
                                         </TextBlock>
                                     </TabItem.Header>
                                     <TreeView x:Name="_treeView"
@@ -1066,6 +1082,7 @@
                                               ItemTemplate="{DynamicResource TreeViewItemDataTemplate}"
                                               ItemsPanel="{DynamicResource TreeViewItemsPanelTemplate}"
                                               ItemsSource="{Binding Mode=OneWay}"
+                                              Padding="0"
                                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                               d:DataContext="{d:DesignData Source=TreeViewSampleData.xaml}" />
                                 </TabItem>
@@ -1073,7 +1090,9 @@
                                          BorderBrush="#FFC3C3C3"
                                          Style="{DynamicResource TabItemInternalStyle}">
                                     <TabItem.Header>
-                                        <TextBlock Background="{x:Null}"><Run Text="По приоритетам" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Background="{x:Null}"
+                                                   FontSize="12"><Run Text="По приоритетам" />
                                         </TextBlock>
                                     </TabItem.Header>
                                     <ListView x:Name="_listViewPriority"
@@ -1096,7 +1115,9 @@
                                          BorderBrush="#FFC3C3C3"
                                          Style="{DynamicResource TabItemInternalStyle}">
                                     <TabItem.Header>
-                                        <TextBlock Background="{x:Null}"><Run Text="По сложности" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Background="{x:Null}"
+                                                   FontSize="12"><Run Text="По сложности" />
                                         </TextBlock>
                                     </TabItem.Header>
                                     <ListView x:Name="_listViewStatus"
