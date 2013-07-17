@@ -15,6 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using DevExpress.Xpf.Core;
+using DevExpress.Xpf.Ribbon;
 using log4net;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
@@ -25,9 +27,9 @@ namespace AGENTIK
     /// <summary>
     /// Interaction logic for BalloonSampleWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : DXWindow
     {
-        private ILog _log = LogManager.GetLogger(typeof(MainWindow));
+        private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
         private Uri _logoutUri = new Uri("http://skylogic.mysecretar.com/mys/logout");
@@ -172,7 +174,9 @@ namespace AGENTIK
             {
                 Activate();
             }
-            RefreshIcon(0, Visibility.Hidden);
+
+            if(_isLogin)
+                RefreshIcon(0, Visibility.Hidden);
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e)
@@ -240,11 +244,6 @@ namespace AGENTIK
                 }
 
                 ShowNotification();
-                RefreshIcon(_tickets.Count, Visibility.Visible);
-                var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(directory.FullName, "Sounds/sound.mp3");
-                mediaElement.Source = new Uri(path);
-                mediaElement.Play();
             }
             catch (Exception ex)
             {
@@ -252,18 +251,36 @@ namespace AGENTIK
             }
         }
 
+        private void MediaElementOnMediaEnded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            mediaElement.Source = null;
+        }
+
         private void ShowNotification()
         {
             try
             {
+                var source = _treeViewSource.Where(t => t.IsNew).ToList();
+
+                if(!source.Any())
+                    return;
+
                 var balloon = new FancyBalloon();
                 balloon.BalloonText = "Мой Секретарь";
-                balloon.TreeViewSource = _treeViewSource.Where(t => t.IsNew);
+                balloon.TreeViewSource = source;
                 balloon.MouseLeftButtonUp += OnBalloonMouseLeftButtonUp;
                 balloon.MouseRightButtonUp += OnBalloonMouseRightButtonUp;
 
                 //show balloon and close it after 4 seconds
                 MyNotifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
+
+                RefreshIcon(_tickets.Count, Visibility.Visible);
+                var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
+                var path = Path.Combine(directory.FullName, "Sounds\\sound.mp3");
+                mediaElement.MediaEnded += MediaElementOnMediaEnded;
+                mediaElement.Source = new Uri(path);
+                mediaElement.Play();
+
             }
             catch (Exception ex)
             {
@@ -446,7 +463,8 @@ namespace AGENTIK
 
         private void ButtonClick(object sender, RoutedEventArgs e)
         {
-        	RefreshData();
+            if(_isLogin)
+        	    RefreshData();
         }
 
         private void OnSettingsButtonClick(object sender, RoutedEventArgs e)

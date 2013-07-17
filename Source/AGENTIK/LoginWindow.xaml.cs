@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using AGENTIK.Controls.AutoCompleteTextBox;
+using DevExpress.Xpf.Editors;
+using DevExpress.Xpf.Ribbon;
 
 namespace AGENTIK
 {
     /// <summary>
     /// Interaction logic for LoginWindow.xaml
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class LoginWindow : DXRibbonWindow
     {
-        private readonly IsolatedStorageFile _isolatedStorageFile = null;
+        private readonly IsolatedStorageFile _isolatedStorageFile;
 
         private readonly Dictionary<string, string> _dictionary;
 
@@ -24,7 +24,7 @@ namespace AGENTIK
 
         public string Login
         {
-            get { return txtBoxUserName.Text; }
+            get { return cmbBoxUserName.Text; }
         }
 
         public string Password
@@ -33,7 +33,7 @@ namespace AGENTIK
             set { passwordBox.Password = value; }
         }
 
-        public PasswordBox PasswordBox
+        public PasswordBoxEdit PasswordBox
         {
             get { return passwordBox; } 
         }
@@ -60,8 +60,7 @@ namespace AGENTIK
             try
             {
                 Load();
-                foreach (var pair in _dictionary)
-                    txtBoxUserName.AddItem(new AutoCompleteEntry(pair.Key, pair.Key));
+                cmbBoxUserName.ItemsSource = _dictionary.Keys.ToList();
             }
             catch (Exception ex)
             {
@@ -75,11 +74,11 @@ namespace AGENTIK
             {
                 using (var isolatedStorageFileStream = new IsolatedStorageFileStream(FileName, FileMode.OpenOrCreate, _isolatedStorageFile))
                 {
-                    if (!_dictionary.ContainsKey(txtBoxUserName.Text))
+                    if (!_dictionary.ContainsKey(cmbBoxUserName.Text))
                     {
                         using (var writer = new StreamWriter(isolatedStorageFileStream))
                         {
-                            writer.WriteLine("{0}:{1}", txtBoxUserName.Text, passwordBox.Password);
+                            writer.WriteLine("{0}:{1}", cmbBoxUserName.Text, passwordBox.Password);
                         }
                     }
                 }
@@ -125,21 +124,13 @@ namespace AGENTIK
         {
             try
             {
-                if (_dictionary.ContainsKey(txtBoxUserName.Text))
-                    passwordBox.Password = _dictionary[txtBoxUserName.Text];
-                SetSelection(passwordBox, passwordBox.Password.Length, 0);
+                if (_dictionary.ContainsKey(cmbBoxUserName.Text))
+                    passwordBox.EditValue = _dictionary[cmbBoxUserName.Text];
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
-
-        private void SetSelection(PasswordBox passwordBox, int start, int length)
-        {
-            passwordBox.GetType()
-                       .GetMethod("Select", BindingFlags.Instance | BindingFlags.NonPublic)
-                       .Invoke(passwordBox, new object[] { start, length });
-        } 
     }
 }

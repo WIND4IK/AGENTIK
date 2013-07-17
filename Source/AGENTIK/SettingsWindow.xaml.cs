@@ -1,34 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using DevExpress.Xpf.Core;
+using DevExpress.Xpf.Grid.LookUp;
+using DevExpress.Xpf.Ribbon;
 using Microsoft.Win32;
+using log4net;
 
 namespace AGENTIK
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : DXRibbonWindow
     {
+        private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public const string ApplicationKeyName = "Software\\AGENTIK";
 
         private RegistryKey _registryKey;
 
-        private const string _loginKey = "LoginUri";
-        private const string _logoutKey = "LogoutUri";
-        private const string _dataKey = "DataUri";
-        private const string _refreshTimeKey = "RefreshTime";
+        private const string LoginKey = "LoginUri";
+        private const string LogoutKey = "LogoutUri";
+        private const string DataKey = "DataUri";
+        private const string RefreshTimeKey = "RefreshTime";
         private readonly string _applicationName = "AGENTIK";
 
         public SettingsWindow()
@@ -41,7 +37,20 @@ namespace AGENTIK
         void SettingsWindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadDataFromRegistry();
+
+            leTheme.ItemsSource = Theme.Themes.ToList().Where(t => !t.Name.Equals(Theme.TouchlineDark.Name)).ToList();
+            leTheme.EditValue = ThemeManager.ApplicationThemeName ?? Theme.DeepBlue.Name;
+            leTheme.EditValueChanged += OnLeThemeEditValueChanged;
             chbStart.IsChecked = IsInStartUp();
+        }
+
+        void OnLeThemeEditValueChanged(object sender, RoutedEventArgs e)
+        {
+            var control = (LookUpEdit) sender;
+            if(control == null || control.EditValue == null || control.EditValue.ToString().Length == 0)
+                return;
+
+            ThemeManager.ApplicationThemeName = control.EditValue.ToString();
         }
 
         public string LoginAddress
@@ -64,8 +73,8 @@ namespace AGENTIK
 
         public DateTime RefreshTime
         {
-            get { return timePicker.Value.HasValue ? timePicker.Value.Value : new DateTime(0,0,0,0,5,0); }
-            set { timePicker.Value = value; }
+            get { return timePicker.DateTime; }
+            set { timePicker.DateTime = value; }
         }
 
         private bool IsInStartUp()
@@ -92,8 +101,9 @@ namespace AGENTIK
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.Error(ex.Message);
                 MessageBox.Show("Ошибка!", "Внимание", MessageBoxButton.OK);
             }
         }
@@ -108,17 +118,18 @@ namespace AGENTIK
                 if (_registryKey == null)
                     return;
 
-                if(_registryKey.GetValue(_loginKey) != null)
-                    LoginAddress = _registryKey.GetValue(_loginKey).ToString();
-                if (_registryKey.GetValue(_logoutKey) != null)
-                    LogoutAddtess = _registryKey.GetValue(_logoutKey).ToString();
-                if (_registryKey.GetValue(_dataKey) != null)
-                    DataAddress = _registryKey.GetValue(_dataKey).ToString();
-                if (_registryKey.GetValue(_refreshTimeKey) != null)
-                    RefreshTime = DateTime.Parse(_registryKey.GetValue(_refreshTimeKey).ToString());
+                if(_registryKey.GetValue(LoginKey) != null)
+                    LoginAddress = _registryKey.GetValue(LoginKey).ToString();
+                if (_registryKey.GetValue(LogoutKey) != null)
+                    LogoutAddtess = _registryKey.GetValue(LogoutKey).ToString();
+                if (_registryKey.GetValue(DataKey) != null)
+                    DataAddress = _registryKey.GetValue(DataKey).ToString();
+                if (_registryKey.GetValue(RefreshTimeKey) != null)
+                    RefreshTime = DateTime.Parse(_registryKey.GetValue(RefreshTimeKey).ToString());
             }
             catch(Exception ex)
             {
+                _log.Error(ex.Message);
                 MessageBox.Show("Ошибка при загрузке данных из реестра", "Внимание", MessageBoxButton.OK);
             }
         }
@@ -133,16 +144,17 @@ namespace AGENTIK
                 if (_registryKey == null)
                     return;
 
-                _registryKey.SetValue(_loginKey, LoginAddress);
-                _registryKey.SetValue(_logoutKey, LogoutAddtess);
-                _registryKey.SetValue(_dataKey, DataAddress);
-                _registryKey.SetValue(_refreshTimeKey, RefreshTime);
+                _registryKey.SetValue(LoginKey, LoginAddress);
+                _registryKey.SetValue(LogoutKey, LogoutAddtess);
+                _registryKey.SetValue(DataKey, DataAddress);
+                _registryKey.SetValue(RefreshTimeKey, RefreshTime);
 
                 var isChecked = chbStart.IsChecked.HasValue && chbStart.IsChecked.Value;
                 RegisterInStartup(isChecked);
             }
             catch (Exception ex)
             {
+                _log.Error(ex.Message);
                 MessageBox.Show("Ошибка при сохранении настроек", "Внимание", MessageBoxButton.OK);
             }
         }

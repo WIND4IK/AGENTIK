@@ -22,6 +22,7 @@ namespace AGENTIK
             {
                 yield return new MessageMapping(NativeMethods.WindowMessage.WindowPositionChanging, OnPreviewPositionChange);
                 yield return new MessageMapping(NativeMethods.WindowMessage.SysCommand, OnSysCommand);
+                yield return new MessageMapping(NativeMethods.WindowMessage.GetMinMaxInfo, OnGetMinMaxInfo);
             }
         }
 
@@ -51,7 +52,14 @@ namespace AGENTIK
 
         private IntPtr OnSysCommand(IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            _maximizeCommandRecieved = (wParam.ToInt32() == (int) NativeMethods.SystemMenuItem.Maximize);
+            _maximizeCommandRecieved = wParam.ToInt32() == (int) NativeMethods.SystemMenuItem.Maximize;
+            return IntPtr.Zero;
+        }
+
+        private IntPtr OnGetMinMaxInfo(IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            //For DevExpress DXRibbonWindow lParam = 122413148 on miximazed
+            _maximizeCommandRecieved = wParam.ToInt32() == (int)NativeMethods.SystemMenuItem.Maximize;
             return IntPtr.Zero;
         }
     }
