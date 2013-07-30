@@ -22,6 +22,7 @@
                       HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       VerticalContentAlignment="Center"
+                      Text="http://skylogic.mysecretar.com/mys"
                       TextWrapping="Wrap" />
         <dxe:TextEdit x:Name="txtLogout"
                       Width="283"
@@ -30,6 +31,7 @@
                       HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       VerticalContentAlignment="Center"
+                      Text="http://skylogic.mysecretar.com/mys/logout"
                       TextWrapping="Wrap" />
         <dxe:TextEdit x:Name="txtData"
                       Width="283"
@@ -38,6 +40,7 @@
                       HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       VerticalContentAlignment="Center"
+                      Text="http://skylogic.mysecretar.com/mys/xml"
                       TextWrapping="Wrap" />
         <Label Width="125"
                Height="24"
@@ -69,7 +72,10 @@
                       AllowNullInput="False"
                       DateEditPopupContentType="DateTimePicker"
                       DisplayFormatString="HH:mm:ss"
+                      Mask="HH:mm:ss"
+                      MaskCulture="ru-RU"
                       MaskType="DateTime"
+                      MaskUseAsDisplayFormat="True"
                       ShowClearButton="False"
                       ShowEditorButtons="False" />
         <dxe:CheckEdit x:Name="chbStart"

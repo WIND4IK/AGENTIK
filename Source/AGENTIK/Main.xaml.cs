@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -67,9 +68,10 @@ namespace AGENTIK
 
             _isLogin = false;
 
-            _treeView.ItemsSource = _treeViewSource;
-            _listViewPriority.ItemsSource = _tickets;
-            _listViewStatus.ItemsSource = _tickets;
+            taskNavControl.ItemsSource = _treeViewSource;
+            //_treeView.ItemsSource = _treeViewSource;
+            //_listViewPriority.ItemsSource = _tickets;
+            //_listViewStatus.ItemsSource = _tickets;
 
             Loaded += OnMainWindowLoaded;
         }
@@ -78,6 +80,9 @@ namespace AGENTIK
         {
             Left = SystemParameters.WorkArea.Width - ActualWidth;
             Top = SystemParameters.WorkArea.Height - ActualHeight;
+            //SizeToContent = SizeToContent.Height;
+            
+            ThemeManager.ApplicationThemeName = Theme.Office2007Blue.Name;
         }
 
         private async Task<bool> Login(string login, string password)
@@ -428,6 +433,7 @@ namespace AGENTIK
 
         void OnLoginButtonClick(object sender, RoutedEventArgs e)
         {
+            _loginWindow.btnLogin.Focus();
             TryLogin();
         }
 

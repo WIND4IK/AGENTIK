@@ -39,7 +39,7 @@ namespace AGENTIK
             LoadDataFromRegistry();
 
             leTheme.ItemsSource = Theme.Themes.ToList().Where(t => !t.Name.Equals(Theme.TouchlineDark.Name)).ToList();
-            leTheme.EditValue = ThemeManager.ApplicationThemeName ?? Theme.DeepBlue.Name;
+            leTheme.EditValue = ThemeManager.ApplicationThemeName ?? Theme.Office2007Blue.Name;
             leTheme.EditValueChanged += OnLeThemeEditValueChanged;
             chbStart.IsChecked = IsInStartUp();
         }
@@ -118,11 +118,11 @@ namespace AGENTIK
                 if (_registryKey == null)
                     return;
 
-                if(_registryKey.GetValue(LoginKey) != null)
+                if (_registryKey.GetValue(LoginKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LoginKey).ToString()))
                     LoginAddress = _registryKey.GetValue(LoginKey).ToString();
-                if (_registryKey.GetValue(LogoutKey) != null)
+                if (_registryKey.GetValue(LogoutKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LogoutKey).ToString()))
                     LogoutAddtess = _registryKey.GetValue(LogoutKey).ToString();
-                if (_registryKey.GetValue(DataKey) != null)
+                if (_registryKey.GetValue(DataKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LogoutKey).ToString()))
                     DataAddress = _registryKey.GetValue(DataKey).ToString();
                 if (_registryKey.GetValue(RefreshTimeKey) != null)
                     RefreshTime = DateTime.Parse(_registryKey.GetValue(RefreshTimeKey).ToString());
