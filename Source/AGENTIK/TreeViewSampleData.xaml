@@ -7,9 +7,7 @@
 
     <agentik:ViewTicket Title="Название организации1">
         <agentik:ViewTicket.Children>
-            <agentik:ViewTicket Title="Название1">
-                <agentik:Ticket Uri="http://documentation.devexpress.com/#WPF/CustomDocument6658" />
-            </agentik:ViewTicket>
+            <agentik:ViewTicket Title="Название1" />
             <agentik:ViewTicket Title="Название2" />
             <agentik:ViewTicket Title="Название3" />
             <agentik:ViewTicket Title="Название4" />

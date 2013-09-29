@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Clerk
+namespace Agentik
 {
   /// <summary>
   /// Interaction logic for App.xaml

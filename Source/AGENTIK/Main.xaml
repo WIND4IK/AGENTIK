@@ -63,7 +63,7 @@
 
     <i:Interaction.Behaviors>
         <huddled:SnapToBehavior SnapDistance="20" />
-        <!--  <agentik:MaximizeBehavior />  -->
+        <agentik:MaximizeBehavior />
     </i:Interaction.Behaviors>
 
     <Grid>
@@ -79,12 +79,8 @@
                         <CommandBinding CanExecute="OnCanExecute"
                                         Command="{StaticResource LogoutCommand}"
                                         Executed="LogoutOnExecuted" />
-                        <CommandBinding CanExecute="OnLoginCanExecute"
-                                        Command="{StaticResource LoginCommand}"
-                                        Executed="LoginOnExecuted" />
 
                     </ContextMenu.CommandBindings>
-                    <MenuItem Command="{StaticResource LoginCommand}" Header="Login" />
                     <MenuItem Command="{StaticResource LogoutCommand}" Header="Logout" />
                     <Separator />
                     <MenuItem Click="OnExitClick" Header="Выход" />
@@ -99,9 +95,6 @@
             <Grid Grid.Row="0">
                 <Grid>
                     <Grid.CommandBindings>
-                        <CommandBinding CanExecute="OnLoginCanExecute"
-                                        Command="{StaticResource LoginCommand}"
-                                        Executed="LoginOnExecuted" />
                         <CommandBinding CanExecute="OnCanExecute"
                                         Command="{StaticResource RefreshCommand}"
                                         Executed="RefreshOnExecuted" />
@@ -159,7 +152,7 @@
             <Grid Grid.Row="1">
                 <dxn:NavBarControl x:Name="navBar">
                     <dxn:NavBarControl.View>
-                        <dxn:NavigationPaneView dxn:ScrollingSettings.ScrollMode="Buttons" />
+                        <dxn:NavigationPaneView dxn:ScrollingSettings.ScrollMode="Buttons" MaxVisibleGroupCount="0" />
                     </dxn:NavBarControl.View>
                     <dxn:NavBarGroup DisplaySource="Content"
                                      Header="Задания"
@@ -181,11 +174,10 @@
                                                         <ColumnDefinition Width="26" />
                                                         <ColumnDefinition Width="26" />
                                                         <ColumnDefinition Width="26" />
-                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="2" />
                                                     </Grid.ColumnDefinitions>
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="31" />
-                                                        <RowDefinition />
                                                     </Grid.RowDefinitions>
                                                     <Border Margin="3,5"
                                                             HorizontalAlignment="Stretch"
@@ -203,7 +195,6 @@
                                                                    TextWrapping="Wrap" />
                                                     </Border>
                                                     <TextBlock Grid.Column="1"
-                                                               Grid.ColumnSpan="1"
                                                                Margin="5,0,0,0"
                                                                VerticalAlignment="Center"
                                                                Text="{Binding Header.Title}"
@@ -241,8 +232,9 @@
                                                             VerticalContentAlignment="Center"
                                                             Background="{x:Null}"
                                                             BorderBrush="{x:Null}"
-                                                            BorderThickness="0">
-                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Actions/Show_32x32.png" />
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Miscellaneous/ViewOnWeb_32x32.png" />
                                                     </Button>
                                                 </Grid>
                                             </DataTemplate>
@@ -273,7 +265,163 @@
                                                     <TextBlock x:Name="textBlock"
                                                                Grid.Column="1"
                                                                VerticalAlignment="Center">
-                                                        <Hyperlink NavigateUri="{Binding Content.Ticket.Uri}">
+                                                        <Hyperlink NavigateUri="{Binding Content.Uri}">
+                                                            <i:Interaction.Behaviors>
+                                                                <agentik:HyperlinkNavigationBehavior />
+                                                            </i:Interaction.Behaviors>
+                                                            <Run Text="{Binding Content.Title}" ToolTip="{Binding Path=Content.Title}" />
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                    <!--
+                                                        <Button Grid.Column="2">
+                                                        <Grid Width="18" Height="18">
+                                                        <Image x:Name="timerImageB"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        <Image x:Name="timerImageG"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        </Grid>
+                                                        </Button>
+                                                    -->
+                                                </Grid>
+                                                <!--
+                                                    <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="True">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF5AC467" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="1" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="False">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF3D3D3D" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="0" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="1" />
+                                                    </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                -->
+
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.ItemTemplate>
+                                    </dxn:ExplorerBarView>
+                                </dxn:NavBarControl.View>
+                            </dxn:NavBarControl>
+                        </dxn:NavBarGroup.Content>
+                    </dxn:NavBarGroup>
+                    <dxn:NavBarGroup x:Name="eventGroup"
+                                     DisplaySource="Content"
+                                     Header="События"
+                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Content/Notes_32x32.png">
+                        <dxn:NavBarGroup.Content>
+                            <dxn:NavBarControl x:Name="eventNavControl"
+                                               Margin="1,0,1,0"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch">
+                                <dxn:NavBarControl.View>
+                                    <dxn:ExplorerBarView GroupDisplayMode="Text">
+                                        <dxn:ExplorerBarView.HeaderTemplate>
+                                            <DataTemplate>
+                                                <Grid Height="Auto" Background="{x:Null}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="40" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="2" />
+
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="31" />
+                                                    </Grid.RowDefinitions>
+                                                    <Border Margin="3,5"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="WhiteSmoke"
+                                                            BorderBrush="#FFB2B2B2"
+                                                            BorderThickness="1"
+                                                            CornerRadius="2">
+                                                        <TextBlock HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="14.667"
+                                                                   Foreground="{Binding GroupControl.Foreground,
+                                                                                        ElementName=navBarGroup}"
+                                                                   Text="{Binding Header.Count}"
+                                                                   TextWrapping="Wrap" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1"
+                                                               Margin="5,0,0,0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Header.Title}"
+                                                               ToolTip="{Binding Header.Title}" />
+                                                    <Button Grid.Column="2"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3"
+                                                               RenderTransformOrigin="0.5,0.5"
+                                                               Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Actions/Cancel_32x32.png">
+                                                            <Image.RenderTransform>
+                                                                <TransformGroup>
+                                                                    <RotateTransform Angle="45" />
+                                                                </TransformGroup>
+                                                            </Image.RenderTransform>
+                                                        </Image>
+                                                    </Button>
+                                                    <Button Grid.Column="3"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Navigation/DocumentMap_32x32.png" />
+                                                    </Button>
+                                                    <Button Grid.Column="4"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Miscellaneous/ViewOnWeb_32x32.png" />
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.HeaderTemplate>
+                                        <dxn:ExplorerBarView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:Name="grid" Height="20">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="12" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="22" />
+                                                        <!--  <ColumnDefinition Width="12" />  -->
+                                                    </Grid.ColumnDefinitions>
+                                                    <!--
+                                                        <Rectangle x:Name="rectangle"
+                                                        Margin="3"
+                                                        Fill="#FF3D3D3D" />
+                                                    -->
+                                                    <BulletDecorator Margin="0,0,0,1"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center">
+                                                        <BulletDecorator.Bullet>
+                                                            <Ellipse Width="5"
+                                                                     Height="5"
+                                                                     Fill="Black" />
+                                                        </BulletDecorator.Bullet>
+                                                    </BulletDecorator>
+                                                    <TextBlock x:Name="textBlock"
+                                                               Grid.Column="1"
+                                                               VerticalAlignment="Center">
+                                                        <Hyperlink NavigateUri="{Binding Content.Uri}">
                                                             <i:Interaction.Behaviors>
                                                                 <agentik:HyperlinkNavigationBehavior />
                                                             </i:Interaction.Behaviors>
@@ -317,38 +465,483 @@
 
                                     </dxn:ExplorerBarView>
                                 </dxn:NavBarControl.View>
-                                <dxn:NavBarGroup />
+
                             </dxn:NavBarControl>
                         </dxn:NavBarGroup.Content>
                     </dxn:NavBarGroup>
-                    <dxn:NavBarGroup x:Name="orderGroup"
-                                     DisplaySource="Items"
-                                     Header="Заказы"
-                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Content/Notes_32x32.png">
+                    <dxn:NavBarGroup x:Name="kopBarGroup"
+                                     DisplaySource="Content"
+                                     Header="КП"
+                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Programming/ProjectFile_32x32.png">
                         <dxn:NavBarGroup.Content>
-                            <dxn:NavBarControl x:Name="orderNavControl"
-                                               Margin="1,0,1,0"
+                            <dxn:NavBarControl x:Name="kopNavControl"
+                                               Margin="1,0"
                                                HorizontalAlignment="Stretch"
                                                VerticalAlignment="Stretch">
                                 <dxn:NavBarControl.View>
-                                    <dxn:ExplorerBarView />
+                                    <dxn:ExplorerBarView GroupDisplayMode="Text">
+                                        <dxn:ExplorerBarView.HeaderTemplate>
+                                            <DataTemplate>
+                                                <Grid Height="Auto" Background="{x:Null}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="40" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="2" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="31" />
+                                                    </Grid.RowDefinitions>
+                                                    <Border Margin="3,5"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="WhiteSmoke"
+                                                            BorderBrush="#FFB2B2B2"
+                                                            BorderThickness="1"
+                                                            CornerRadius="2">
+                                                        <TextBlock HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="14.667"
+                                                                   Foreground="{Binding GroupControl.Foreground,
+                                                                                        ElementName=navBarGroup}"
+                                                                   Text="{Binding Header.Count}"
+                                                                   TextWrapping="Wrap" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1"
+                                                               Margin="5,0,0,0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Header.Title}"
+                                                               ToolTip="{Binding Header.Title}" />
+                                                    <Button Grid.Column="2"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3"
+                                                               RenderTransformOrigin="0.5,0.5"
+                                                               Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Actions/Cancel_32x32.png">
+                                                            <Image.RenderTransform>
+                                                                <TransformGroup>
+                                                                    <RotateTransform Angle="45" />
+                                                                </TransformGroup>
+                                                            </Image.RenderTransform>
+                                                        </Image>
+                                                    </Button>
+                                                    <Button Grid.Column="3"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Navigation/DocumentMap_32x32.png" />
+                                                    </Button>
+                                                    <Button Grid.Column="4"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            VerticalContentAlignment="Center"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Miscellaneous/ViewOnWeb_32x32.png" />
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.HeaderTemplate>
+                                        <dxn:ExplorerBarView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:Name="grid" Height="20">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="12" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="22" />
+                                                        <!--  <ColumnDefinition Width="12" />  -->
+                                                    </Grid.ColumnDefinitions>
+                                                    <!--
+                                                        <Rectangle x:Name="rectangle"
+                                                        Margin="3"
+                                                        Fill="#FF3D3D3D" />
+                                                    -->
+                                                    <BulletDecorator Margin="0,0,0,1"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center">
+                                                        <BulletDecorator.Bullet>
+                                                            <Ellipse Width="5"
+                                                                     Height="5"
+                                                                     Fill="Black" />
+                                                        </BulletDecorator.Bullet>
+                                                    </BulletDecorator>
+                                                    <TextBlock x:Name="textBlock"
+                                                               Grid.Column="1"
+                                                               VerticalAlignment="Center">
+                                                        <Hyperlink NavigateUri="{Binding Content.Uri}">
+                                                            <i:Interaction.Behaviors>
+                                                                <agentik:HyperlinkNavigationBehavior />
+                                                            </i:Interaction.Behaviors>
+                                                            <Run Text="{Binding Content.Title}" ToolTip="{Binding Path=Content.Title}" />
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                    <!--
+                                                        <Button Grid.Column="2">
+                                                        <Grid Width="18" Height="18">
+                                                        <Image x:Name="timerImageB"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        <Image x:Name="timerImageG"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        </Grid>
+                                                        </Button>
+                                                    -->
+                                                </Grid>
+                                                <!--
+                                                    <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="True">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF5AC467" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="1" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="False">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF3D3D3D" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="0" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="1" />
+                                                    </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                -->
+
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.ItemTemplate>
+
+                                    </dxn:ExplorerBarView>
                                 </dxn:NavBarControl.View>
                             </dxn:NavBarControl>
                         </dxn:NavBarGroup.Content>
                     </dxn:NavBarGroup>
-                    <dxn:NavBarGroup DisplaySource="Content"
+                    <dxn:NavBarGroup x:Name="docBarGroup"
+                                     DisplaySource="Content"
                                      Header="Запросы"
-                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Data/EditDataSource_32x32.png">
+                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Export/ExportToDOCX_32x32.png">
                         <dxn:NavBarGroup.Content>
-                            <dxn:NavBarControl Margin="1,0"
+                            <dxn:NavBarControl x:Name="docNavControl"
+                                               Margin="1,0"
                                                HorizontalAlignment="Stretch"
                                                VerticalAlignment="Stretch">
                                 <dxn:NavBarControl.View>
-                                    <dxn:ExplorerBarView />
+                                    <dxn:ExplorerBarView GroupDisplayMode="Text">
+                                        <dxn:ExplorerBarView.HeaderTemplate>
+                                            <DataTemplate>
+                                                <Grid Height="Auto" Background="{x:Null}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="40" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="2" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="31" />
+                                                    </Grid.RowDefinitions>
+                                                    <Border Margin="3,5"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="WhiteSmoke"
+                                                            BorderBrush="#FFB2B2B2"
+                                                            BorderThickness="1"
+                                                            CornerRadius="2">
+                                                        <TextBlock HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="14.667"
+                                                                   Foreground="{Binding GroupControl.Foreground,
+                                                                                        ElementName=navBarGroup}"
+                                                                   Text="{Binding Header.Count}"
+                                                                   TextWrapping="Wrap" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1"
+                                                               Margin="5,0,0,0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Header.Title}"
+                                                               ToolTip="{Binding Header.Title}" />
+                                                    <Button Grid.Column="2"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3"
+                                                               RenderTransformOrigin="0.5,0.5"
+                                                               Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Actions/Cancel_32x32.png">
+                                                            <Image.RenderTransform>
+                                                                <TransformGroup>
+                                                                    <RotateTransform Angle="45" />
+                                                                </TransformGroup>
+                                                            </Image.RenderTransform>
+                                                        </Image>
+                                                    </Button>
+                                                    <Button Grid.Column="3"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Navigation/DocumentMap_32x32.png" />
+                                                    </Button>
+                                                    <Button Grid.Column="4"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            VerticalContentAlignment="Center"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Miscellaneous/ViewOnWeb_32x32.png" />
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.HeaderTemplate>
+                                        <dxn:ExplorerBarView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:Name="grid" Height="20">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="12" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="22" />
+                                                        <!--  <ColumnDefinition Width="12" />  -->
+                                                    </Grid.ColumnDefinitions>
+                                                    <!--
+                                                        <Rectangle x:Name="rectangle"
+                                                        Margin="3"
+                                                        Fill="#FF3D3D3D" />
+                                                    -->
+                                                    <BulletDecorator Margin="0,0,0,1"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center">
+                                                        <BulletDecorator.Bullet>
+                                                            <Ellipse Width="5"
+                                                                     Height="5"
+                                                                     Fill="Black" />
+                                                        </BulletDecorator.Bullet>
+                                                    </BulletDecorator>
+                                                    <TextBlock x:Name="textBlock"
+                                                               Grid.Column="1"
+                                                               VerticalAlignment="Center">
+                                                        <Hyperlink NavigateUri="{Binding Content.Uri}">
+                                                            <i:Interaction.Behaviors>
+                                                                <agentik:HyperlinkNavigationBehavior />
+                                                            </i:Interaction.Behaviors>
+                                                            <Run Text="{Binding Content.Title}" ToolTip="{Binding Path=Content.Title}" />
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                    <!--
+                                                        <Button Grid.Column="2">
+                                                        <Grid Width="18" Height="18">
+                                                        <Image x:Name="timerImageB"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        <Image x:Name="timerImageG"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        </Grid>
+                                                        </Button>
+                                                    -->
+                                                </Grid>
+                                                <!--
+                                                    <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="True">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF5AC467" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="1" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="False">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF3D3D3D" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="0" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="1" />
+                                                    </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                -->
+
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.ItemTemplate>
+                                    </dxn:ExplorerBarView>
                                 </dxn:NavBarControl.View>
                             </dxn:NavBarControl>
                         </dxn:NavBarGroup.Content>
                     </dxn:NavBarGroup>
+                    <dxn:NavBarGroup x:Name="payBarGroup"
+                                     DisplaySource="Content"
+                                     Header="Счета"
+                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Miscellaneous/Currency_32x32.png">
+                        <dxn:NavBarGroup.Content>
+                            <dxn:NavBarControl x:Name="payNavControl"
+                                               Margin="1,0"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch">
+                                <dxn:NavBarControl.View>
+                                    <dxn:ExplorerBarView GroupDisplayMode="Text">
+                                        <dxn:ExplorerBarView.HeaderTemplate>
+                                            <DataTemplate>
+                                                <Grid Height="Auto" Background="{x:Null}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="40" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="26" />
+                                                        <ColumnDefinition Width="2" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="31" />
+                                                    </Grid.RowDefinitions>
+                                                    <Border Margin="3,5"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="WhiteSmoke"
+                                                            BorderBrush="#FFB2B2B2"
+                                                            BorderThickness="1"
+                                                            CornerRadius="2">
+                                                        <TextBlock HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="14.667"
+                                                                   Foreground="{Binding GroupControl.Foreground,
+                                                                                        ElementName=navBarGroup}"
+                                                                   Text="{Binding Header.Count}"
+                                                                   TextWrapping="Wrap" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1"
+                                                               Margin="5,0,0,0"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Header.Title}"
+                                                               ToolTip="{Binding Header.Title}" />
+                                                    <Button Grid.Column="2"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3"
+                                                               RenderTransformOrigin="0.5,0.5"
+                                                               Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Actions/Cancel_32x32.png">
+                                                            <Image.RenderTransform>
+                                                                <TransformGroup>
+                                                                    <RotateTransform Angle="45" />
+                                                                </TransformGroup>
+                                                            </Image.RenderTransform>
+                                                        </Image>
+                                                    </Button>
+                                                    <Button Grid.Column="3"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Navigation/DocumentMap_32x32.png" />
+                                                    </Button>
+                                                    <Button Grid.Column="4"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Center"
+                                                            VerticalContentAlignment="Center"
+                                                            Background="{x:Null}"
+                                                            BorderBrush="{x:Null}"
+                                                            BorderThickness="0"
+                                                            Padding="4">
+                                                        <Image Margin="-3" Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Miscellaneous/ViewOnWeb_32x32.png" />
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.HeaderTemplate>
+                                        <dxn:ExplorerBarView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid x:Name="grid" Height="20">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="12" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="22" />
+                                                        <!--  <ColumnDefinition Width="12" />  -->
+                                                    </Grid.ColumnDefinitions>
+                                                    <!--
+                                                        <Rectangle x:Name="rectangle"
+                                                        Margin="3"
+                                                        Fill="#FF3D3D3D" />
+                                                    -->
+                                                    <BulletDecorator Margin="0,0,0,1"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center">
+                                                        <BulletDecorator.Bullet>
+                                                            <Ellipse Width="5"
+                                                                     Height="5"
+                                                                     Fill="Black" />
+                                                        </BulletDecorator.Bullet>
+                                                    </BulletDecorator>
+                                                    <TextBlock x:Name="textBlock"
+                                                               Grid.Column="1"
+                                                               VerticalAlignment="Center">
+                                                        <Hyperlink NavigateUri="{Binding Content.Uri}">
+                                                            <i:Interaction.Behaviors>
+                                                                <agentik:HyperlinkNavigationBehavior />
+                                                            </i:Interaction.Behaviors>
+                                                            <Run Text="{Binding Content.Title}" ToolTip="{Binding Path=Content.Title}" />
+                                                        </Hyperlink>
+                                                    </TextBlock>
+                                                    <!--
+                                                        <Button Grid.Column="2">
+                                                        <Grid Width="18" Height="18">
+                                                        <Image x:Name="timerImageB"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        <Image x:Name="timerImageG"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch"
+                                                        Opacity="1"
+                                                        Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Scheduling/Time_32x32.png" />
+                                                        </Grid>
+                                                        </Button>
+                                                    -->
+                                                </Grid>
+                                                <!--
+                                                    <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="True">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF5AC467" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="1" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Content.IsNew}" Value="False">
+                                                    <Setter TargetName="rectangle" Property="Fill" Value="#FF3D3D3D" />
+                                                    <Setter TargetName="timerImageG" Property="Opacity" Value="0" />
+                                                    <Setter TargetName="timerImageB" Property="Opacity" Value="1" />
+                                                    </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                -->
+
+                                            </DataTemplate>
+                                        </dxn:ExplorerBarView.ItemTemplate>
+                                    </dxn:ExplorerBarView>
+                                </dxn:NavBarControl.View>
+                            </dxn:NavBarControl>
+                        </dxn:NavBarGroup.Content>
+                    </dxn:NavBarGroup>
+
                 </dxn:NavBarControl>
             </Grid>
         </Grid>

@@ -3,7 +3,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
-                    Title="Форма авторизации"
+                    Title="  AGENTIK"
                     Width="319.617"
                     Height="170.346"
                     FontFamily="Verdana"
@@ -18,7 +18,6 @@
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top"
                           AllowDefaultButton="False"
-                          NullText="Пользователь"
                           ToolTip="Пользователь" AutoComplete="True" />
 
         <dxe:PasswordBoxEdit x:Name="passwordBox"
@@ -29,8 +28,8 @@
                              VerticalAlignment="Top"
                              VerticalContentAlignment="Center"
                              GotFocus="OnPasswordBoxGotFocus"
-                             MaxLength="4"
-                             NullText="Пароль" />
+                             MaxLength="256"
+                             KeyUp="OnPasswordBoxKeyUp" ShowCapsLockWarningToolTip="True"/>
 
         <Button x:Name="btnLogin"
                 Width="114"
@@ -38,7 +37,8 @@
                 Margin="179,92,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Content="Войти" />
+                Content="Войти" 
+                Click="OnLoginButtonClick"/>
 
         <Label Margin="10,11,0,0"
                HorizontalAlignment="Left"

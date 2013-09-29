@@ -29,13 +29,12 @@ namespace AGENTIK
 
         public bool IsNew
         {
-
-            get { return true; }
+            get { return _ticket != null && _ticket.RowProperty.New; }
         }
 
         public int Count { get { return Children.Count; } }
 
-        public Uri Uri { get; set; }
+        public Uri Uri { get { return _ticket != null ? _ticket.RowType.Uri : null; } }
 
         public string Title { get; set; }
 
@@ -50,23 +49,9 @@ namespace AGENTIK
             
         }
 
-        public int Id { get; internal set; }
+        public RowProperty RowProperty { get; internal set; }
 
-        public int Contractor { get; internal set; }
-
-        public string NameContractor { get; internal set; }
-
-        public string Theme { get; internal set; }
-
-        public Uri Uri { get; internal set; }
-
-        public int PriorityId { get; internal set; }
-
-        public string Priority { get; internal set; }
-
-        public int StatusId { get; internal set; }
-
-        public string Status { get; internal set; }
+        public RowType RowType { get; internal set; }
 
         public List<Ticket> Children { get; set; }
 
@@ -91,7 +76,7 @@ namespace AGENTIK
         /// </returns>
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return RowProperty.Number.GetHashCode();
         }
 
         /// <summary>
@@ -114,28 +99,16 @@ namespace AGENTIK
                 return true;
             if (this.GetType() != other.GetType())
                 return false;
-            return this.Id == other.Id;
+            return this.RowProperty != null && other.RowProperty != null && this.RowProperty.Number == other.RowProperty.Number;
         }
 
         #region IXmlSerializable
 
-        private const string idElementName = "ID";
+        private const string RowTypeGroup = "row_type";
+        private const string RowPropertyGroup = "row_properties";
 
-        private const string contractorElementName = "contractor";
-
-        private const string nameContractorElementName = "name_contractor";
-
-        private const string temaElementName = "tema";
-
-        private const string urlElementName = "url";
-
-        private const string idPriorityElementName = "id_priority";
-
-        private const string priorityElementName = "priority";
-
-        private const string idStatusElementName = "id_status";
-
-        private const string statusElementName = "status";
+        private static readonly XmlSerializer RowTypeSerializer = new XmlSerializer(typeof(RowType));
+        private static readonly XmlSerializer RowPropertySerializer = new XmlSerializer(typeof(RowProperty));
 
         System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
         {
@@ -149,15 +122,8 @@ namespace AGENTIK
         void IXmlSerializable.ReadXml(XmlReader reader)
         {
             XElement element = XElement.Load(reader);
-            Id = int.Parse(element.Element(idElementName).Value);
-            Contractor = int.Parse(element.Element(contractorElementName).Value);
-            NameContractor = HttpUtility.HtmlDecode(element.Element(nameContractorElementName).Value);
-            Theme = HttpUtility.HtmlDecode(element.Element(temaElementName).Value);
-            Uri = new Uri(HttpUtility.HtmlDecode(element.Element(urlElementName).Value));
-            PriorityId = int.Parse(element.Element(idPriorityElementName).Value);
-            Priority = element.Element(priorityElementName).Value;
-            StatusId = int.Parse(element.Element(idStatusElementName).Value);
-            Status = element.Element(statusElementName).Value;
+            if(element.Element(RowTypeGroup) != null) RowType = (RowType)RowTypeSerializer.Deserialize(element.Element(RowTypeGroup).CreateReader());
+            if (element.Element(RowPropertyGroup) != null) RowProperty = (RowProperty)RowPropertySerializer.Deserialize(element.Element(RowPropertyGroup).CreateReader());
         }
 
         /// <summary>
@@ -172,5 +138,214 @@ namespace AGENTIK
         }
 
         #endregion IXmlSerializable
+    }
+
+    [XmlRoot("row_type")]
+    public class RowType : IXmlSerializable
+    {
+
+        #region IXmlSerializable
+        private const string TemaElementName = "tema";
+        private const string UrlElementName = "url";
+        private const string TypeNameElementName = "typename";
+        private const string TypeElementName = "type";
+
+        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+            return null;
+        }
+        /// <summary>
+        /// Generates an object from its XML representation.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        void IXmlSerializable.ReadXml(XmlReader reader) {
+            XElement element = XElement.Load(reader);
+            Theme = HttpUtility.HtmlDecode(element.Element(TemaElementName).TryGetValue());
+            Uri = new Uri(HttpUtility.HtmlDecode(element.Element(UrlElementName).TryGetValue()));
+            Name = HttpUtility.HtmlDecode(element.Element(TypeNameElementName).TryGetValue());
+            TypeRow = element.Element(TypeElementName).TryGetValue();
+        }
+
+        public string TypeRow { get; internal set; }
+
+        public string Name { get; internal set; }
+
+        public Uri Uri { get; internal set; }
+
+        public string Theme { get; internal set; }
+
+        /// <summary>
+        /// Converts an object into its XML representation.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <remarks>Not supported.</remarks>
+        /// <exception cref="System.NotSupportedException"></exception>
+        void IXmlSerializable.WriteXml(XmlWriter writer) {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
+
+    [XmlRoot("row_properties")]
+    public class RowProperty : IXmlSerializable {
+        public Priority Priority { get; internal set; }
+
+        public Contractor Contractor { get; internal set; }
+
+        public Status Status { get; internal set; }
+
+        public DateTime Date { get; internal set; }
+
+        public bool New { get; internal set; }
+
+        public int Number { get; internal set; }
+
+        #region IXmlSerializable
+        private const string NumberElementName = "number";
+        private const string NewElementName = "new";
+        private const string DateElementName = "date";
+
+        private const string StatusGroup = "status";
+        private const string ContractorGroup = "contractor";
+        private const string PriorityGroup = "priority";
+
+        private static readonly XmlSerializer StatusSerializer = new XmlSerializer(typeof(Status));
+        private static readonly XmlSerializer ContractorSerializer = new XmlSerializer(typeof(Contractor));
+        private static readonly XmlSerializer PrioritySerializer = new XmlSerializer(typeof(Priority));
+
+        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+            return null;
+        }
+        /// <summary>
+        /// Generates an object from its XML representation.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        void IXmlSerializable.ReadXml(XmlReader reader) {
+            XElement element = XElement.Load(reader);
+            Number = element.Element(NumberElementName).TryGetIntValue();
+            New = element.Element(NewElementName).TryGetBoolValue();
+            Date = element.Element(DateElementName).TryGetDateTimeValue();
+            if (element.Element(StatusGroup) != null) Status = (Status)StatusSerializer.Deserialize(element.Element(StatusGroup).CreateReader());
+            if (element.Element(ContractorGroup) != null) Contractor = (Contractor)ContractorSerializer.Deserialize(element.Element(ContractorGroup).CreateReader());
+            if (element.Element(PriorityGroup) != null) Priority = (Priority)PrioritySerializer.Deserialize(element.Element(PriorityGroup).CreateReader());
+        }
+
+        /// <summary>
+        /// Converts an object into its XML representation.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <remarks>Not supported.</remarks>
+        /// <exception cref="System.NotSupportedException"></exception>
+        void IXmlSerializable.WriteXml(XmlWriter writer) {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
+
+    [XmlRoot("status")]
+    public class Status : IXmlSerializable {
+
+        #region IXmlSerializable
+        private const string StatusIDElementName = "status_id";
+        private const string StatusNameElementName = "status_name";
+
+        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+            return null;
+        }
+        /// <summary>
+        /// Generates an object from its XML representation.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        void IXmlSerializable.ReadXml(XmlReader reader) {
+            XElement element = XElement.Load(reader);
+            ID = element.Element(StatusIDElementName).TryGetIntValue();
+            Name = HttpUtility.HtmlDecode(element.Element(StatusNameElementName).TryGetValue());
+        }
+
+        public int ID { get; internal set; }
+
+        public string Name { get; internal set; }
+
+        /// <summary>
+        /// Converts an object into its XML representation.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <remarks>Not supported.</remarks>
+        /// <exception cref="System.NotSupportedException"></exception>
+        void IXmlSerializable.WriteXml(XmlWriter writer) {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
+
+    [XmlRoot("contractor")]
+    public class Contractor : IXmlSerializable {
+
+        #region IXmlSerializable
+        private const string ContractorIDElementName = "contractor_id";
+        private const string ContractorNameElementName = "contractor_name";
+
+        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+            return null;
+        }
+        /// <summary>
+        /// Generates an object from its XML representation.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        void IXmlSerializable.ReadXml(XmlReader reader) {
+            XElement element = XElement.Load(reader);
+            ID = element.Element(ContractorIDElementName).TryGetIntValue();
+            Name = HttpUtility.HtmlDecode(element.Element(ContractorNameElementName).TryGetValue());
+        }
+
+        public int ID { get; internal set; }
+
+        public string Name { get; internal set; }
+
+        /// <summary>
+        /// Converts an object into its XML representation.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <remarks>Not supported.</remarks>
+        /// <exception cref="System.NotSupportedException"></exception>
+        void IXmlSerializable.WriteXml(XmlWriter writer) {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
+
+    [XmlRoot("priority")]
+    public class Priority : IXmlSerializable {
+
+        #region IXmlSerializable
+        private const string PriorityIDElementName = "priority_id";
+        private const string PriorityNameElementName = "priority_name";
+
+        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+            return null;
+        }
+        /// <summary>
+        /// Generates an object from its XML representation.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        void IXmlSerializable.ReadXml(XmlReader reader) {
+            XElement element = XElement.Load(reader);
+            ID = element.Element(PriorityIDElementName).TryGetIntValue();
+            Name = HttpUtility.HtmlDecode(element.Element(PriorityNameElementName).TryGetValue());
+        }
+
+        public int ID { get; internal set; }
+
+        public string Name { get; internal set; }
+
+        /// <summary>
+        /// Converts an object into its XML representation.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <remarks>Not supported.</remarks>
+        /// <exception cref="System.NotSupportedException"></exception>
+        void IXmlSerializable.WriteXml(XmlWriter writer) {
+            throw new NotSupportedException();
+        }
+        #endregion
     }
 }

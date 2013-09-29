@@ -8,13 +8,11 @@ using DevExpress.Xpf.Ribbon;
 using Microsoft.Win32;
 using log4net;
 
-namespace AGENTIK
-{
+namespace AGENTIK {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : DXRibbonWindow
-    {
+    public partial class SettingsWindow : DXRibbonWindow {
         private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public const string ApplicationKeyName = "Software\\AGENTIK";
@@ -27,15 +25,13 @@ namespace AGENTIK
         private const string RefreshTimeKey = "RefreshTime";
         private readonly string _applicationName = "AGENTIK";
 
-        public SettingsWindow()
-        {
+        public SettingsWindow() {
             InitializeComponent();
             _applicationName = Assembly.GetExecutingAssembly().GetName().Name;
             Loaded += SettingsWindowLoaded;
         }
 
-        void SettingsWindowLoaded(object sender, RoutedEventArgs e)
-        {
+        void SettingsWindowLoaded(object sender, RoutedEventArgs e) {
             LoadDataFromRegistry();
 
             leTheme.ItemsSource = Theme.Themes.ToList().Where(t => !t.Name.Equals(Theme.TouchlineDark.Name)).ToList();
@@ -44,74 +40,61 @@ namespace AGENTIK
             chbStart.IsChecked = IsInStartUp();
         }
 
-        void OnLeThemeEditValueChanged(object sender, RoutedEventArgs e)
-        {
-            var control = (LookUpEdit) sender;
-            if(control == null || control.EditValue == null || control.EditValue.ToString().Length == 0)
+        void OnLeThemeEditValueChanged(object sender, RoutedEventArgs e) {
+            var control = (LookUpEdit)sender;
+            if (control == null || control.EditValue == null || control.EditValue.ToString().Length == 0)
                 return;
 
             ThemeManager.ApplicationThemeName = control.EditValue.ToString();
         }
 
-        public string LoginAddress
-        {
+        public string LoginAddress {
             get { return txtMain.Text; }
             set { txtMain.Text = value; }
         }
 
-        public string LogoutAddtess
-        {
+        public string LogoutAddtess {
             get { return txtLogout.Text; }
             set { txtLogout.Text = value; }
         }
 
-        public string DataAddress
-        {
+        public string DataAddress {
             get { return txtData.Text; }
             set { txtData.Text = value; }
         }
 
-        public DateTime RefreshTime
-        {
+        public DateTime RefreshTime {
             get { return timePicker.DateTime; }
             set { timePicker.DateTime = value; }
         }
 
-        private bool IsInStartUp()
-        {
+        private bool IsInStartUp() {
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false);
             return registryKey.GetValue(_applicationName) != null;
         }
 
-        private void RegisterInStartup(bool isChecked)
-        {
-            try
-            {
+        private void RegisterInStartup(bool isChecked) {
+            try {
                 RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                if (isChecked)
-                {
+                if (isChecked) {
                     var address = Assembly.GetExecutingAssembly().Location;
                     registryKey.SetValue(_applicationName, address);
                 }
-                else
-                {
+                else {
                     var exist = registryKey.GetValue(_applicationName);
-                    if(exist != null)
+                    if (exist != null)
                         registryKey.DeleteValue(_applicationName);
                 }
 
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
                 MessageBox.Show("Ошибка!", "Внимание", MessageBoxButton.OK);
             }
         }
 
-        protected void LoadDataFromRegistry()
-        {
-            try
-            {
+        protected void LoadDataFromRegistry() {
+            try {
                 RegistryKey hklm = Registry.CurrentUser;
                 _registryKey = hklm.CreateSubKey(ApplicationKeyName);
 
@@ -127,17 +110,14 @@ namespace AGENTIK
                 if (_registryKey.GetValue(RefreshTimeKey) != null)
                     RefreshTime = DateTime.Parse(_registryKey.GetValue(RefreshTimeKey).ToString());
             }
-            catch(Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
                 MessageBox.Show("Ошибка при загрузке данных из реестра", "Внимание", MessageBoxButton.OK);
             }
         }
 
-        protected void SaveDataFromRegistry()
-        {
-            try
-            {
+        protected void SaveDataFromRegistry() {
+            try {
                 RegistryKey hklm = Registry.CurrentUser;
                 _registryKey = hklm.CreateSubKey(ApplicationKeyName);
 
@@ -152,21 +132,18 @@ namespace AGENTIK
                 var isChecked = chbStart.IsChecked.HasValue && chbStart.IsChecked.Value;
                 RegisterInStartup(isChecked);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
                 MessageBox.Show("Ошибка при сохранении настроек", "Внимание", MessageBoxButton.OK);
             }
         }
 
-        private void OnSaveButtonClick(object sender, RoutedEventArgs e)
-        {
+        private void OnSaveButtonClick(object sender, RoutedEventArgs e) {
             SaveDataFromRegistry();
             Close();
         }
 
-        private void OnCancelButtonClick(object sender, RoutedEventArgs e)
-        {
+        private void OnCancelButtonClick(object sender, RoutedEventArgs e) {
             Close();
         }
     }

@@ -1,7 +1,7 @@
-﻿<Application x:Class="Clerk.App"
+﻿<Application x:Class="Agentik.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="Main.xaml">
+             StartupUri="LoginWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

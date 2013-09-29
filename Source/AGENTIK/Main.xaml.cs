@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,28 +9,27 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using DevExpress.Data.PLinq.Helpers;
 using DevExpress.Xpf.Core;
-using DevExpress.Xpf.Ribbon;
 using log4net;
+using Updater;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
-namespace AGENTIK
-{
+namespace AGENTIK {
 
     /// <summary>
     /// Interaction logic for BalloonSampleWindow.xaml
     /// </summary>
-    public partial class MainWindow : DXWindow
-    {
+    public partial class MainWindow : DXWindow {
         private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
@@ -43,125 +43,74 @@ namespace AGENTIK
 
         private readonly ObservableCollection<Ticket> _tickets;
 
-        private bool _isLogin;
-
         private bool _isClose;
 
         private readonly TrayIcon _trayIcon = new TrayIcon();
 
-        private LoginWindow _loginWindow;
-
-        public bool IsLogin
-        {
-            get { return _isLogin; }
-        }
-
-        public MainWindow()
-        {
+        public MainWindow(CookieContainer cookieContainer) {
             InitializeComponent();
 
-            _cookieContainer = new CookieContainer();
+            _cookieContainer = cookieContainer;
 
             _treeViewSource = new ObservableCollection<ViewTicket>();
 
             _tickets = new ObservableCollection<Ticket>();
 
-            _isLogin = false;
-
-            taskNavControl.ItemsSource = _treeViewSource;
-            //_treeView.ItemsSource = _treeViewSource;
-            //_listViewPriority.ItemsSource = _tickets;
-            //_listViewStatus.ItemsSource = _tickets;
-
             Loaded += OnMainWindowLoaded;
         }
 
-        void OnMainWindowLoaded(object sender, RoutedEventArgs e)
-        {
+        void OnMainWindowLoaded(object sender, RoutedEventArgs e) {
             Left = SystemParameters.WorkArea.Width - ActualWidth;
             Top = SystemParameters.WorkArea.Height - ActualHeight;
             //SizeToContent = SizeToContent.Height;
-            
-            ThemeManager.ApplicationThemeName = Theme.Office2007Blue.Name;
+
+            LoadData();
         }
 
-        private async Task<bool> Login(string login, string password)
-        {
-            try
-            {
-                using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true})
-                {
-                    using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
-                    {
-                        var content = new List<KeyValuePair<string, string>>
-                            {
-                                new KeyValuePair<string, string>("login", login), 
-                                new KeyValuePair<string, string>("password", password), 
-                                new KeyValuePair<string, string>("remember_me", "on"), 
-                                new KeyValuePair<string, string>("loginCaptcha", "")
-                            };
+        private void LoadData() {
+            try {
+                RefreshData();
+                var dispatcherTimer = new DispatcherTimer();
+                dispatcherTimer.Tick += Callback;
+                dispatcherTimer.Interval = _interval;
+                dispatcherTimer.Start();
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
+        }
 
-                        var requestMessage = new HttpRequestMessage(HttpMethod.Post, _baseAddress) {Content = new FormUrlEncodedContent(content)};
+
+        private async void Logout() {
+            try {
+                using (var handler = new HttpClientHandler { CookieContainer = _cookieContainer, UseCookies = true }) {
+                    using (var client = new HttpClient(handler) { BaseAddress = _baseAddress }) {
+                        var requestMessage = new HttpRequestMessage { Method = HttpMethod.Get };
                         HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
                         response.EnsureSuccessStatusCode();
-
-                        var responseCookies = _cookieContainer.GetCookies(_baseAddress);
-
-                        return responseCookies.Count == 3;
                     }
                 }
             }
-            catch (HttpRequestException ex)
-            {
+            catch (HttpRequestException ex) {
                 _log.Error(ex.Message);
-                return false;
             }
         }
 
-        private async Task<bool> Logout()
-        {
-            try
-            {
-                using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true})
-                {
-                    using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
-                    {
-                        var requestMessage = new HttpRequestMessage {Method = HttpMethod.Get};
-                        HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
-                        response.EnsureSuccessStatusCode();
-
-                        var responseCookies = _cookieContainer.GetCookies(_logoutUri);
-
-                        return responseCookies.Count == 3;
-                    }
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                _log.Error(ex.Message);
-                return false;
-            }
-        }
-
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
-        {
-            if (_isClose)
-            {
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e) {
+            if (_isClose) {
                 //clean up notifyicon (would otherwise stay open until application finishes)
                 MyNotifyIcon.Dispose();
 
                 base.OnClosing(e);
             }
-            else
-            {
+            else {
                 ShowInTaskbar = false;
                 Visibility = Visibility.Hidden;
                 e.Cancel = true;
             }
         }
 
-        private void MyNotifyIconOnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
-        {
+        private void MyNotifyIconOnTrayMouseDoubleClick(object sender, RoutedEventArgs e) {
             //_balloon = new FancyBalloon();
             //_balloon.BalloonText = "Мой Секретарь";
             //_balloon.TreeViewSource = _treeViewSource;
@@ -170,77 +119,61 @@ namespace AGENTIK
 
             ////show balloon and close it after 4 seconds
             //MyNotifyIcon.ShowCustomBalloon(_balloon, PopupAnimation.Slide, 4000);
-            if (Visibility == Visibility.Hidden)
-            {
+            if (Visibility == Visibility.Hidden) {
                 Show();
                 ShowInTaskbar = true;
             }
-            else if (Visibility == Visibility.Visible)
-            {
+            else if (Visibility == Visibility.Visible) {
                 Activate();
             }
 
-            if(_isLogin)
-                RefreshIcon(0, Visibility.Hidden);
+            RefreshIcon(0, Visibility.Hidden);
         }
 
-        private void OnExitClick(object sender, RoutedEventArgs e)
-        {
-            _isLogin = !Logout().Result;
+        private void OnExitClick(object sender, RoutedEventArgs e) {
+            Logout();
             _isClose = true;
             Close();
         }
 
-        private void Callback(object sender, EventArgs e)
-        {
+        private void Callback(object sender, EventArgs e) {
             RefreshData();
         }
 
-        private async Task<ObservableCollection<Ticket>> GetTickets()
-        {
-            try
-            {
-                using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true})
-                {
-                    using (var client = new HttpClient(handler) {BaseAddress = _baseAddress})
-                    {
+        private async Task<ObservableCollection<Ticket>> GetTickets() {
+            try {
+                using (var handler = new HttpClientHandler { CookieContainer = _cookieContainer, UseCookies = true }) {
+                    using (var client = new HttpClient(handler) { BaseAddress = _baseAddress }) {
                         Stream stream = await client.GetStreamAsync(_dataUri).ConfigureAwait(false);
                         XDocument document = XDocument.Load(stream);
-                        var serializer = new XmlSerializer(typeof (Ticket));
+                        var serializer = new XmlSerializer(typeof(Ticket));
                         var elements = document.Root.Elements().ToArray();
-                        var tickets = elements.Select(element => (Ticket) serializer.Deserialize(element.CreateReader())).ToList();
+                        var tickets = elements.Select(element => (Ticket)serializer.Deserialize(element.CreateReader())).ToList();
 
                         return new ObservableCollection<Ticket>(tickets);
                     }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
                 return new ObservableCollection<Ticket>();
             }
         }
 
-        private void RefreshData()
-        {
-            try
-            {
+        private void RefreshData() {
+            try {
                 _tickets.Clear();
                 _treeViewSource.Clear();
 
                 foreach (var ticket in GetTickets().Result)
                     _tickets.Add(ticket);
 
-                var contractors = _tickets.Select(t => new { ID = t.Contractor, Name = t.NameContractor }).ToList();
-                foreach (var contractor in contractors)
-                {
-                    var maitTicket = new ViewTicket(null);
-                    maitTicket.Title = contractor.Name;
+                var contractors = _tickets.Select(t => new {t.RowProperty.Contractor.ID, t.RowProperty.Contractor.Name }).Distinct().ToList();
+                foreach (var contractor in contractors) {
+                    var maitTicket = new ViewTicket(null) {Title = contractor.Name};
 
-                    foreach (var ticket in _tickets.Where(t => t.Contractor == contractor.ID))
-                    {
-                        var viewTicket = new ViewTicket(ticket);
-                        viewTicket.Title = ticket.Theme;
+                    foreach (var ticket in _tickets.Where(t => t.RowProperty.Contractor.ID == contractor.ID)) {
+                        var viewTicket = new ViewTicket(ticket) {Title = ticket.RowType.Theme};
 
                         maitTicket.Children.Add(viewTicket);
                     }
@@ -248,38 +181,46 @@ namespace AGENTIK
                     _treeViewSource.Add(maitTicket);
                 }
 
+                taskNavControl.ItemsSource = _treeViewSource.SelectByType("job");
+                eventNavControl.ItemsSource = _treeViewSource.SelectByType("evn");
+                kopNavControl.ItemsSource = _treeViewSource.SelectByType("kop");
+                docNavControl.ItemsSource = _treeViewSource.SelectByType("doc");
+                payNavControl.ItemsSource = _treeViewSource.SelectByType("pay");
+
                 ShowNotification();
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
 
-        private void MediaElementOnMediaEnded(object sender, RoutedEventArgs routedEventArgs)
-        {
+        private void MediaElementOnMediaEnded(object sender, RoutedEventArgs routedEventArgs) {
             mediaElement.Source = null;
         }
 
-        private void ShowNotification()
-        {
-            try
-            {
-                var source = _treeViewSource.Where(t => t.IsNew).ToList();
+        private void ShowNotification() {
+            try {
 
-                if(!source.Any())
+                var ids = _tickets.Where(t => t.RowProperty.New).Select(t => t.RowProperty.Number).ToList();
+                var source = _treeViewSource.Where(k => k.Children.Any(t => t.IsNew)).ToList();
+
+                RefreshIcon(source.Count, source.Count == 0 ? Visibility.Hidden : Visibility.Visible);
+
+                if (!source.Any())
                     return;
 
-                var balloon = new FancyBalloon();
-                balloon.BalloonText = "Мой Секретарь";
-                balloon.TreeViewSource = source;
+                //Filter only New tickets
+                foreach (var viewTicket in source) {
+                    viewTicket.Children = new ObservableCollection<ViewTicket>(viewTicket.Children.Where(t => ids.Contains(t.Ticket.RowProperty.Number)));
+                }
+
+                var balloon = new FancyBalloon {BalloonText = "Мой Секретарь", TreeViewSource = source};
                 balloon.MouseLeftButtonUp += OnBalloonMouseLeftButtonUp;
                 balloon.MouseRightButtonUp += OnBalloonMouseRightButtonUp;
 
                 //show balloon and close it after 4 seconds
                 MyNotifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
 
-                RefreshIcon(_tickets.Count, Visibility.Visible);
                 var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
                 var path = Path.Combine(directory.FullName, "Sounds\\sound.mp3");
                 mediaElement.MediaEnded += MediaElementOnMediaEnded;
@@ -287,28 +228,22 @@ namespace AGENTIK
                 mediaElement.Play();
 
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
 
-        void OnBalloonMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
+        void OnBalloonMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
+            try {
                 MyNotifyIcon.CloseBalloon();
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
 
-        void OnBalloonMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
+        void OnBalloonMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+            try {
                 if (Visibility == Visibility.Hidden)
                     Visibility = Visibility.Visible;
                 else
@@ -316,36 +251,31 @@ namespace AGENTIK
                 MyNotifyIcon.CloseBalloon();
                 RefreshIcon(0, Visibility.Hidden);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
 
-        private void RefreshIcon(int count, Visibility visibility)
-        {
-            try
-            {
+        private void RefreshIcon(int count, Visibility visibility) {
+            try {
                 _trayIcon.ItemCounter = count;
                 _trayIcon.ItemCounterVisibility = visibility;
                 var stream = CreateImage();
                 MyNotifyIcon.IconStream = stream;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
 
-        private Stream CreateImage()
-        {
-            Matrix m = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformToDevice;
+        private Stream CreateImage() {
+            Visual visual = Application.Current.MainWindow ?? (Visual)VisualTreeHelper.GetParent((DependencyObject)Content);
+            Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
             Point dpi = m.Transform(new Point(96, 96));
 
             bool measureValid = _trayIcon.IsMeasureValid;
 
-            if (!measureValid)
-            {
+            if (!measureValid) {
                 var size = new Size(32, 32);
                 _trayIcon.Measure(size);
                 _trayIcon.Arrange(new Rect(size));
@@ -361,10 +291,8 @@ namespace AGENTIK
             return ConvertToBitmap(bmp);
         }
 
-        private Stream ConvertToBitmap(RenderTargetBitmap renderTargetBitmap)
-        {
-            try
-            {
+        private Stream ConvertToBitmap(RenderTargetBitmap renderTargetBitmap) {
+            try {
 
                 var bitmapEncoder = new PngBitmapEncoder();
                 bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
@@ -375,125 +303,55 @@ namespace AGENTIK
 
                 return stream;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
             return null;
         }
 
-        private void LogoutOnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            _isLogin = !Logout().Result;
+        private void LogoutOnExecuted(object sender, ExecutedRoutedEventArgs e) {
+            Logout();
 
             _tickets.Clear();
             _treeViewSource.Clear();
 
-            MyNotifyIcon.IconSource = new BitmapImage(new Uri("pack://application:,,,/Icons/Error.ico"));
+            var loginWindow = new LoginWindow { DisableAutoLogin = true };
+            loginWindow.Show();
+
+            _isClose = true;
+            Close();
         }
 
-        private void OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = IsLogin;
-            e.Handled = true;
-        }
-
-        private void RefreshOnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            RefreshData();
-        }
-
-        private void OnLoginCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
+        private void OnCanExecute(object sender, CanExecuteRoutedEventArgs e) {
             e.CanExecute = true;
             e.Handled = true;
         }
 
-        private void LoginOnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            try
-            {
-                _loginWindow = new LoginWindow();
-                _loginWindow.btnLogin.Click += OnLoginButtonClick;
-                _loginWindow.PasswordBox.KeyUp += OnPasswordBoxKeyUp;
-                _loginWindow.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex.Message);
-                MessageBox.Show("Ошибка при Login!", "Ошибка!", MessageBoxButton.OK);
-            }
+        private void RefreshOnExecuted(object sender, ExecutedRoutedEventArgs e) {
+            RefreshData();
         }
 
-        private void OnPasswordBoxKeyUp(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Enter)
-                TryLogin();
+        private void ButtonClick(object sender, RoutedEventArgs e) {
+            RefreshData();
         }
 
-        void OnLoginButtonClick(object sender, RoutedEventArgs e)
-        {
-            _loginWindow.btnLogin.Focus();
-            TryLogin();
-        }
-
-        private void TryLogin()
-        {
-            try
-            {
-                _isLogin = Login(_loginWindow.Login, _loginWindow.Password).Result;
-                if (!_isLogin)
-                {
-                    MessageBox.Show("Неверный логин или пароль!", "Внимание!", MessageBoxButton.OK);
-                    _loginWindow.Password = String.Empty;
-                }
-                else
-                {
-                    RefreshData();
-                    var dispatcherTimer = new DispatcherTimer();
-                    dispatcherTimer.Tick += Callback;
-                    dispatcherTimer.Interval = _interval;
-                    dispatcherTimer.Start();
-
-                    if(_loginWindow.Remember)
-                        _loginWindow.Save();
-                    _loginWindow.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex.Message);
-            }
-
-        }
-
-        private void ButtonClick(object sender, RoutedEventArgs e)
-        {
-            if(_isLogin)
-        	    RefreshData();
-        }
-
-        private void OnSettingsButtonClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
+        private void OnSettingsButtonClick(object sender, RoutedEventArgs e) {
+            try {
                 var settingsWindow = new SettingsWindow();
                 settingsWindow.Owner = this;
                 settingsWindow.ShowDialog();
 
-                if (settingsWindow.DialogResult != null && (bool) settingsWindow.DialogResult)
-                {
-                    if(settingsWindow.LoginAddress.Length > 0)
+                if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
+                    if (settingsWindow.LoginAddress.Length > 0)
                         _baseAddress = new Uri(settingsWindow.LoginAddress);
-                    if(settingsWindow.LogoutAddtess.Length > 0)
+                    if (settingsWindow.LogoutAddtess.Length > 0)
                         _logoutUri = new Uri(settingsWindow.LogoutAddtess);
-                    if(settingsWindow.DataAddress.Length > 0)
+                    if (settingsWindow.DataAddress.Length > 0)
                         _dataUri = new Uri(settingsWindow.DataAddress);
                     _interval = settingsWindow.RefreshTime.TimeOfDay;
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
