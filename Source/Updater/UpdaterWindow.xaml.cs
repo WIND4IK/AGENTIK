@@ -4,13 +4,14 @@ using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Windows;
+using DevExpress.Xpf.Core;
 using log4net;
 
 namespace Updater {
     /// <summary>
     /// Interaction logic for UpdaterWindow.xaml
     /// </summary>
-    public partial class UpdaterWindow : Window {
+    public partial class UpdaterWindow : DXWindow {
         private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private WebClient _webClient;
         private readonly Stopwatch _stopWatch = new Stopwatch();

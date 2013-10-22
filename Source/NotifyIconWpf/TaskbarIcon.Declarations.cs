@@ -31,6 +31,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
+using System.Windows.Controls.Primitives;
 using AGENTIK.TaskbarNotification.Interop;
 
 namespace AGENTIK.TaskbarNotification
@@ -47,7 +49,7 @@ namespace AGENTIK.TaskbarNotification
     public const string CategoryName = "NotifyIcon";
 
 
-    //POPUP CONTROLS
+    //Popup CONTROLS
 
     #region TrayPopupResolved
 
@@ -147,7 +149,7 @@ namespace AGENTIK.TaskbarNotification
         = CustomBalloonPropertyKey.DependencyProperty;
 
     /// <summary>
-    /// A custom popup that is being displayed in the tray area in order
+    /// A custom Popup that is being displayed in the tray area in order
     /// to display messages to the user.
     /// </summary>
     public Popup CustomBalloon
@@ -213,7 +215,7 @@ namespace AGENTIK.TaskbarNotification
           Stream newValue = (Stream)e.NewValue;
 
           //resolving the ImageSource at design time is unlikely to work
-          if (!Util.IsDesignMode)
+          if (!Util.IsDesignMode && newValue != null)
           {
               var bmp = new Bitmap(newValue);
 
@@ -421,7 +423,7 @@ namespace AGENTIK.TaskbarNotification
     #region TrayPopup dependency property
 
     /// <summary>
-    /// A control that is displayed as a popup when the taskbar icon is clicked.
+    /// A control that is displayed as a Popup when the taskbar icon is clicked.
     /// </summary>
     public static readonly DependencyProperty TrayPopupProperty =
         DependencyProperty.Register("TrayPopup",
@@ -432,7 +434,7 @@ namespace AGENTIK.TaskbarNotification
     /// <summary>
     /// A property wrapper for the <see cref="TrayPopupProperty"/>
     /// dependency property:<br/>
-    /// A control that is displayed as a popup when the taskbar icon is clicked.
+    /// A control that is displayed as a Popup when the taskbar icon is clicked.
     /// </summary>
     [Category(CategoryName)]
     [Description("Displayed as a Popup if the user clicks on the taskbar icon.")]
@@ -1390,7 +1392,7 @@ namespace AGENTIK.TaskbarNotification
         RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(TaskbarIcon));
 
     /// <summary>
-    /// Bubbled event that occurs when the custom popup is being opened.
+    /// Bubbled event that occurs when the custom Popup is being opened.
     /// </summary>
     public event RoutedEventHandler TrayPopupOpen
     {
@@ -1427,7 +1429,7 @@ namespace AGENTIK.TaskbarNotification
         RoutingStrategy.Tunnel, typeof(RoutedEventHandler), typeof(TaskbarIcon));
 
     /// <summary>
-    /// Tunneled event that occurs when the custom popup is being opened.
+    /// Tunneled event that occurs when the custom Popup is being opened.
     /// </summary>
     public event RoutedEventHandler PreviewTrayPopupOpen
     {

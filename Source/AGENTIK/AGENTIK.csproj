@@ -58,6 +58,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Page Include="GrowlNotifiactions.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\ButtonStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -254,6 +262,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Extensions.cs" />
+    <Compile Include="GrowlNotifiactions.xaml.cs">
+      <DependentUpon>GrowlNotifiactions.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HyperlinkNavigationBehavior.cs" />
     <Compile Include="MaximizeBehavior.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
@@ -263,12 +274,6 @@
     <Compile Include="TrayIcon.xaml.cs">
       <DependentUpon>TrayIcon.xaml</DependentUpon>
     </Compile>
-    <Page Include="FancyBalloon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Main.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -281,9 +286,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FancyBalloon.xaml.cs">
-      <DependentUpon>FancyBalloon.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -375,6 +377,7 @@
     <Resource Include="Images\TimerG.png" />
     <Resource Include="Images\PlusB.png" />
     <Resource Include="Images\SettingsB.png" />
+    <Resource Include="Resources\close.png" />
     <Content Include="Sounds\sound.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -1,8 +1,9 @@
-﻿<Window x:Class="Updater.UpdaterWindow"
+﻿<dx:DXWindow x:Class="Updater.UpdaterWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         Title="  AGENTIK" SizeToContent="Height" Width="511.421" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Height="157">
     <Grid>
         <Grid.RowDefinitions>
@@ -26,4 +27,4 @@
         <Button x:Name="btnCancel" Content="Отмена" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Width="91" Click="OnCancelButtonClick" Tag="0" Height="24" Margin="0,3"/>
 
     </Grid>
-</Window>
+</dx:DXWindow>

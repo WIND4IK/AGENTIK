@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
@@ -8,19 +11,19 @@ using System.Xml.Serialization;
 
 namespace AGENTIK
 {
+    public class Notifications : ObservableCollection<Ticket> { }
+
+    [Serializable]
     public class ViewTicket
     {
         private readonly Ticket _ticket;
 
-        public ViewTicket()
-        {
-            
-        }
+        public ViewTicket(){ }
 
         public ViewTicket(Ticket ticket)
         {
             _ticket = ticket;
-            Children = new ObservableCollection<ViewTicket>();
+            Children = new List<ViewTicket>();
         }
         public Ticket Ticket
         {
@@ -38,20 +41,35 @@ namespace AGENTIK
 
         public string Title { get; set; }
 
-        public ObservableCollection<ViewTicket> Children { get; set; }
+        public List<ViewTicket> Children { get; set; }
+
+        public object Clone() {
+            return this.MemberwiseClone();
+        }
+        public ViewTicket DeepClone() {
+            using (var ms = new MemoryStream()) {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, this);
+                ms.Position = 0;
+                return (ViewTicket)formatter.Deserialize(ms);
+            }
+        }
     }
 
+    [Serializable]
     [XmlRoot("row")]
     public class Ticket : IEquatable<Ticket>, IXmlSerializable
     {
         public Ticket()
         {
-            
+            Buttons = new List<TimerButton>();
         }
 
         public RowProperty RowProperty { get; internal set; }
 
         public RowType RowType { get; internal set; }
+
+        public List<TimerButton> Buttons { get; internal set; }
 
         public List<Ticket> Children { get; set; }
 
@@ -107,8 +125,12 @@ namespace AGENTIK
         private const string RowTypeGroup = "row_type";
         private const string RowPropertyGroup = "row_properties";
 
+        private const string ButtonGroup = "button";
+        private const string ButtonsGroup = "buttons";
+
         private static readonly XmlSerializer RowTypeSerializer = new XmlSerializer(typeof(RowType));
         private static readonly XmlSerializer RowPropertySerializer = new XmlSerializer(typeof(RowProperty));
+        private static readonly XmlSerializer ButtonSerializer = new XmlSerializer(typeof(TimerButton));
 
         System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
         {
@@ -124,6 +146,12 @@ namespace AGENTIK
             XElement element = XElement.Load(reader);
             if(element.Element(RowTypeGroup) != null) RowType = (RowType)RowTypeSerializer.Deserialize(element.Element(RowTypeGroup).CreateReader());
             if (element.Element(RowPropertyGroup) != null) RowProperty = (RowProperty)RowPropertySerializer.Deserialize(element.Element(RowPropertyGroup).CreateReader());
+            XElement buttonsElement = element.Element(ButtonsGroup);
+            if (buttonsElement != null) {
+                foreach (var buttonElement in buttonsElement.Elements(ButtonGroup)) {
+                    Buttons.Add((TimerButton)ButtonSerializer.Deserialize(buttonElement.CreateReader()));
+                }
+            }
         }
 
         /// <summary>
@@ -140,6 +168,7 @@ namespace AGENTIK
         #endregion IXmlSerializable
     }
 
+    [Serializable]
     [XmlRoot("row_type")]
     public class RowType : IXmlSerializable
     {
@@ -147,6 +176,7 @@ namespace AGENTIK
         #region IXmlSerializable
         private const string TemaElementName = "tema";
         private const string UrlElementName = "url";
+        private const string IconElementName = "ico";
         private const string TypeNameElementName = "typename";
         private const string TypeElementName = "type";
 
@@ -161,6 +191,7 @@ namespace AGENTIK
             XElement element = XElement.Load(reader);
             Theme = HttpUtility.HtmlDecode(element.Element(TemaElementName).TryGetValue());
             Uri = new Uri(HttpUtility.HtmlDecode(element.Element(UrlElementName).TryGetValue()));
+            Icon = new Uri(HttpUtility.HtmlDecode(element.Element(IconElementName).TryGetValue()));
             Name = HttpUtility.HtmlDecode(element.Element(TypeNameElementName).TryGetValue());
             TypeRow = element.Element(TypeElementName).TryGetValue();
         }
@@ -170,6 +201,8 @@ namespace AGENTIK
         public string Name { get; internal set; }
 
         public Uri Uri { get; internal set; }
+
+        public Uri Icon { get; internal set; }
 
         public string Theme { get; internal set; }
 
@@ -185,6 +218,7 @@ namespace AGENTIK
         #endregion
     }
 
+    [Serializable]
     [XmlRoot("row_properties")]
     public class RowProperty : IXmlSerializable {
         public Priority Priority { get; internal set; }
@@ -224,9 +258,15 @@ namespace AGENTIK
             Number = element.Element(NumberElementName).TryGetIntValue();
             New = element.Element(NewElementName).TryGetBoolValue();
             Date = element.Element(DateElementName).TryGetDateTimeValue();
-            if (element.Element(StatusGroup) != null) Status = (Status)StatusSerializer.Deserialize(element.Element(StatusGroup).CreateReader());
-            if (element.Element(ContractorGroup) != null) Contractor = (Contractor)ContractorSerializer.Deserialize(element.Element(ContractorGroup).CreateReader());
-            if (element.Element(PriorityGroup) != null) Priority = (Priority)PrioritySerializer.Deserialize(element.Element(PriorityGroup).CreateReader());
+            var statusGroup = element.Element(StatusGroup);
+            if (statusGroup != null)
+                Status = (Status)StatusSerializer.Deserialize(statusGroup.CreateReader());
+            var contractorGroup = element.Element(ContractorGroup);
+            if (contractorGroup != null)
+                Contractor = (Contractor)ContractorSerializer.Deserialize(contractorGroup.CreateReader());
+            var priorityGroup = element.Element(PriorityGroup);
+            if (priorityGroup != null)
+                Priority = (Priority)PrioritySerializer.Deserialize(priorityGroup.CreateReader());
         }
 
         /// <summary>
@@ -241,6 +281,7 @@ namespace AGENTIK
         #endregion
     }
 
+    [Serializable]
     [XmlRoot("status")]
     public class Status : IXmlSerializable {
 
@@ -277,6 +318,7 @@ namespace AGENTIK
         #endregion
     }
 
+    [Serializable]
     [XmlRoot("contractor")]
     public class Contractor : IXmlSerializable {
 
@@ -313,6 +355,7 @@ namespace AGENTIK
         #endregion
     }
 
+    [Serializable]
     [XmlRoot("priority")]
     public class Priority : IXmlSerializable {
 
@@ -348,4 +391,46 @@ namespace AGENTIK
         }
         #endregion
     }
+
+    [Serializable]
+    [XmlRoot("button")]
+    public class TimerButton : IXmlSerializable {
+
+        #region IXmlSerializable
+        private const string ActionElementName = "action";
+        private const string IconElementName = "ico";
+        private const string MethodElementName = "method";
+
+        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+            return null;
+        }
+        /// <summary>
+        /// Generates an object from its XML representation.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
+        void IXmlSerializable.ReadXml(XmlReader reader) {
+            XElement element = XElement.Load(reader);
+            Action = element.Element(ActionElementName).TryGetValue();
+            Icon = new Uri(HttpUtility.HtmlDecode(element.Element(IconElementName).TryGetValue()));
+            Method = element.Element(MethodElementName).TryGetValue();
+        }
+
+        public string Action { get; internal set; }
+
+        public Uri Icon { get; internal set; }
+
+        public string Method { get; internal set; }
+
+        /// <summary>
+        /// Converts an object into its XML representation.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter" /> stream to which the object is serialized.</param>
+        /// <remarks>Not supported.</remarks>
+        /// <exception cref="System.NotSupportedException"></exception>
+        void IXmlSerializable.WriteXml(XmlWriter writer) {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
+
 }

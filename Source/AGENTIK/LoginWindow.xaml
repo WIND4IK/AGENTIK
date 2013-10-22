@@ -4,59 +4,57 @@
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
                     Title="  AGENTIK"
-                    Width="319.617"
-                    Height="170.346"
+                    Width="305"
+                    Height="190"
                     FontFamily="Verdana"
                     ResizeMode="NoResize"
-                    WindowStartupLocation="CenterScreen"
-                    WindowStyle="ToolWindow">
+                    WindowStartupLocation="CenterScreen">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="30" />
+        </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit x:Name="cmbBoxUserName"
-                          Width="172"
-                          Height="26"
-                          Margin="121,10,0,0"
-                          HorizontalAlignment="Left"
-                          VerticalAlignment="Top"
+                          Grid.Row="1"
+                          Grid.Column="1"
                           AllowDefaultButton="False"
                           ToolTip="Пользователь" AutoComplete="True" />
 
         <dxe:PasswordBoxEdit x:Name="passwordBox"
-                             Width="172"
-                             Height="26"
-                             Margin="121,41,0,0"
-                             HorizontalAlignment="Left"
-                             VerticalAlignment="Top"
+                             Grid.Column="1"
+                             Grid.Row="3"
                              VerticalContentAlignment="Center"
                              GotFocus="OnPasswordBoxGotFocus"
                              MaxLength="256"
                              KeyUp="OnPasswordBoxKeyUp" ShowCapsLockWarningToolTip="True"/>
 
         <Button x:Name="btnLogin"
-                Width="114"
-                Height="30"
-                Margin="179,92,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+                Grid.Row="5"
+                Grid.Column="1"
                 Content="Войти" 
-                Click="OnLoginButtonClick"/>
+                Click="OnLoginButtonClick" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
-        <Label Margin="10,11,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               HorizontalContentAlignment="Right"
+        <Label Grid.Row="0"
+               Grid.Column="1"
                Content="Пользователь :" />
-        <Label Margin="51,41,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               HorizontalContentAlignment="Right"
+        <Label Grid.Row="2"
+               Grid.Column="1"
                Content="Пароль :"
-               RenderTransformOrigin="1.474,-0.115" />
+               RenderTransformOrigin="1.474,-0.115" VerticalContentAlignment="Stretch" />
         <dxe:CheckEdit x:Name="chboxRemember"
-                       Width="172"
-                       Margin="121,72,0,0"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Content="Запомнить"
-                       IsChecked="True" />
+                       Grid.Row="4"
+                       Grid.Column="1"
+                       Content="Автом. вход при запуске"
+                       IsChecked="True" VerticalContentAlignment="Stretch" />
     </Grid>
 </dxr:DXRibbonWindow>

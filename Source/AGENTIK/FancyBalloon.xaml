@@ -8,8 +8,7 @@
              x:Name="me"
              Width="350"
              MinHeight="300"
-             FontFamily="Verdana"
-             Foreground="{x:Null}">
+             FontFamily="Verdana">
     <UserControl.Resources>
         <Storyboard x:Key="FadeIn">
             <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
@@ -77,6 +76,7 @@
                 HorizontalAlignment="Stretch"
                 BorderBrush="#FF997137"
                 BorderThickness="1,1,1,1">
+            <!--Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Background}"-->
             <Border.Effect>
                 <DropShadowEffect Color="#FF747474" />
             </Border.Effect>

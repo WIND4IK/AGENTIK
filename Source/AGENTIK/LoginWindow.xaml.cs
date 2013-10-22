@@ -63,6 +63,10 @@ namespace AGENTIK {
         void OnLoginWindowClosing(object sender, EventArgs e) {
             try {
                 if (_isLogin) {
+                    Hide();
+                    ShowInTaskbar = false;
+
+                    _isLogin = false;
 
                     var mainWindow = new MainWindow(_cookieContainer);
                     mainWindow.Show();
@@ -81,8 +85,10 @@ namespace AGENTIK {
 
                 if (!String.IsNullOrEmpty(_currentUser)) {
                     cmbBoxUserName.Text = _currentUser;
-                    if(!DisableAutoLogin && chboxRemember.IsChecked.HasValue && chboxRemember.IsChecked.Value)
+                    if (!DisableAutoLogin && chboxRemember.IsChecked.HasValue && chboxRemember.IsChecked.Value) {
+                        passwordBox.Password = _dictionary[_currentUser];
                         TryLogin();
+                    }
                 }
             }
             catch (Exception ex) {
@@ -96,17 +102,25 @@ namespace AGENTIK {
                 cmbBoxUserName.ItemsSource = _dictionary.Keys.ToList();
             }
             catch (Exception ex) {
-                MessageBox.Show("Runtime Error:" + ex.Message);
+                DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
 
         public void Save() {
             try {
-                using (var isolatedStorageFileStream = new IsolatedStorageFileStream(UsersFileName, FileMode.OpenOrCreate, _isolatedStorageFile)) {
+                using (var isolatedStorageFileStream = new IsolatedStorageFileStream(UsersFileName, FileMode.Create, _isolatedStorageFile)) {
                     using (var writer = new StreamWriter(isolatedStorageFileStream)) {
-                        if (cmbBoxUserName.Text.Length > 0 && !_dictionary.ContainsKey(cmbBoxUserName.Text)) {
+                        if (cmbBoxUserName.Text.Length > 0) {
                             var password = (chboxRemember.IsChecked.HasValue && chboxRemember.IsChecked.Value) ? passwordBox.Password : "";
-                            writer.WriteLine("{0}:{1}", cmbBoxUserName.Text, password);
+                            if (!_dictionary.ContainsKey(cmbBoxUserName.Text)) {
+                                _dictionary.Add(cmbBoxUserName.Text, password);
+                            }
+                            else
+                                _dictionary[cmbBoxUserName.Text] = password;
+                        }
+
+                        foreach (var keyValuePair in _dictionary) {
+                            writer.WriteLine("{0}:{1}", keyValuePair.Key, keyValuePair.Value);
                         }
                     }
                 }
@@ -119,7 +133,7 @@ namespace AGENTIK {
                 }
             }
             catch (Exception ex) {
-                MessageBox.Show("Runtime Error:" + ex.Message);
+                DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
 
@@ -153,7 +167,7 @@ namespace AGENTIK {
                 }
             }
             catch (Exception ex) {
-                MessageBox.Show("Runtime Error:" + ex.Message);
+                DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
 
@@ -196,7 +210,7 @@ namespace AGENTIK {
                     passwordBox.EditValue = _dictionary[cmbBoxUserName.Text];
             }
             catch (Exception ex) {
-                MessageBox.Show("Runtime Error:" + ex.Message);
+                DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
 
@@ -233,7 +247,7 @@ namespace AGENTIK {
                 _isLogin = !DisableAutoLogin ? Login(_currentUser, _dictionary[_currentUser]).Result : Login(cmbBoxUserName.Text, passwordBox.Password).Result;
 
                 if (!_isLogin) {
-                    MessageBox.Show("Неверный логин или пароль!", "Внимание!", MessageBoxButton.OK);
+                    DXMessageBox.Show("Неверный логин или пароль!", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Error);
                     passwordBox.Password = String.Empty;
                 }
                 else {
@@ -247,11 +261,16 @@ namespace AGENTIK {
         }
 
         private void OnPasswordBoxKeyUp(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Enter)
-                TryLogin();
+            if (e.Key == Key.Enter) {
+                DoLogin();
+            }
         }
 
         void OnLoginButtonClick(object sender, RoutedEventArgs e) {
+            DoLogin();
+        }
+
+        private void DoLogin() {
             if (passwordBox.Password.Length == 0) {
                 DXMessageBox.Show("Пароль не может быть пустым!", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;

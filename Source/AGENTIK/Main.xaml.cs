@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -19,6 +20,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using DevExpress.Data.PLinq.Helpers;
 using DevExpress.Xpf.Core;
+using DevExpress.Xpf.NavBar;
 using log4net;
 using Updater;
 using Point = System.Windows.Point;
@@ -39,22 +41,24 @@ namespace AGENTIK {
 
         private static CookieContainer _cookieContainer;
 
-        private readonly ObservableCollection<ViewTicket> _treeViewSource;
+        private readonly List<ViewTicket> _treeViewSource;
 
-        private readonly ObservableCollection<Ticket> _tickets;
+        private readonly List<Ticket> _tickets;
 
         private bool _isClose;
 
         private readonly TrayIcon _trayIcon = new TrayIcon();
+
+        public MainWindow() {}
 
         public MainWindow(CookieContainer cookieContainer) {
             InitializeComponent();
 
             _cookieContainer = cookieContainer;
 
-            _treeViewSource = new ObservableCollection<ViewTicket>();
+            _treeViewSource = new List<ViewTicket>();
 
-            _tickets = new ObservableCollection<Ticket>();
+            _tickets = new List<Ticket>();
 
             Loaded += OnMainWindowLoaded;
         }
@@ -181,16 +185,68 @@ namespace AGENTIK {
                     _treeViewSource.Add(maitTicket);
                 }
 
-                taskNavControl.ItemsSource = _treeViewSource.SelectByType("job");
-                eventNavControl.ItemsSource = _treeViewSource.SelectByType("evn");
-                kopNavControl.ItemsSource = _treeViewSource.SelectByType("kop");
-                docNavControl.ItemsSource = _treeViewSource.SelectByType("doc");
-                payNavControl.ItemsSource = _treeViewSource.SelectByType("pay");
+                navBar.Groups.Clear();
+                var types = _tickets.Where(t => !String.IsNullOrEmpty(t.RowType.TypeRow)).Select(t => t.RowType.TypeRow).Distinct().ToList();
+                foreach (var type in types) {
+                    var typeTickets = _treeViewSource.SelectByType(type);
+                    AddNavBarGroup(typeTickets);
+                }
+                AddTimerButtons();
 
                 ShowNotification();
             }
             catch (Exception ex) {
                 _log.Error(ex.Message);
+            }
+        }
+
+        private void AddNavBarGroup(IEnumerable<ViewTicket> viewTickets) {
+            try {
+                var navBarContentTemplate = FindResource("NavBarGroupContentTemplate") as DataTemplate;
+                if (navBarContentTemplate != null) {
+                    RowType rowType = viewTickets.First().Children.First().Ticket.RowType;
+                    var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = rowType.Name, ImageSource = GetImageFromUrl(rowType.Icon), ContentTemplate = navBarContentTemplate, Content = viewTickets };
+                    navBar.Groups.Add(navBarGroup);
+                }
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
+        }
+
+        private static BitmapImage GetImageFromUrl(Uri uri) {
+            string file = Path.GetTempFileName();
+            var webClient = new WebClient();
+            webClient.DownloadFile(uri.AbsoluteUri, file);
+            var filepath = Path.GetFullPath(file);
+            var pictureUri = new Uri(filepath, UriKind.Absolute);
+            return new BitmapImage(pictureUri);
+        }
+
+        private void AddTimerButtons() {
+            try {
+                var navBarContentTemplate = FindResource("NavBarGroupContentTemplate") as DataTemplate;
+                if (navBarContentTemplate != null) {
+                    var navBarControl = GetVisualChild<NavBarControl>(navBar);
+                    if (navBarControl != null && navBarControl.View != null) {
+                        var view = navBarControl.View as ExplorerBarView;
+                        //var itemTemplate = view.ItemTemplate;
+
+                        foreach (NavBarGroup navBarGroup in navBar.Groups) {
+                            var viewTickets = navBarGroup.Content as List<ViewTicket>;
+                            foreach (ViewTicket viewTicket in viewTickets) {
+                                var grid = (Grid)navBarGroup.FindName("grid");
+                                //var tt = view.ItemContainerGenerator.ContainerFromItem(navBarItem) as TreeViewItem;
+                                //ContentPresenter myContentPresenter = GetVisualChild<ContentPresenter>(navBarItem);
+                                //DataTemplate myDataTemplate = myContentPresenter.ContentTemplate;
+                                //Grid grid = (Grid)myDataTemplate.FindName("grid", myContentPresenter);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
             }
         }
 
@@ -200,26 +256,17 @@ namespace AGENTIK {
 
         private void ShowNotification() {
             try {
-
-                var ids = _tickets.Where(t => t.RowProperty.New).Select(t => t.RowProperty.Number).ToList();
-                var source = _treeViewSource.Where(k => k.Children.Any(t => t.IsNew)).ToList();
+                var source = _tickets.Where(t => t.RowProperty.New).ToList();
 
                 RefreshIcon(source.Count, source.Count == 0 ? Visibility.Hidden : Visibility.Visible);
 
                 if (!source.Any())
                     return;
 
-                //Filter only New tickets
-                foreach (var viewTicket in source) {
-                    viewTicket.Children = new ObservableCollection<ViewTicket>(viewTicket.Children.Where(t => ids.Contains(t.Ticket.RowProperty.Number)));
+                var growlNotifications = new GrowlNotifiactions();
+                foreach (Ticket ticket in source) {
+                    growlNotifications.AddNotification(ticket);                    
                 }
-
-                var balloon = new FancyBalloon {BalloonText = "Мой Секретарь", TreeViewSource = source};
-                balloon.MouseLeftButtonUp += OnBalloonMouseLeftButtonUp;
-                balloon.MouseRightButtonUp += OnBalloonMouseRightButtonUp;
-
-                //show balloon and close it after 4 seconds
-                MyNotifyIcon.ShowCustomBalloon(balloon, PopupAnimation.Slide, 4000);
 
                 var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
                 var path = Path.Combine(directory.FullName, "Sounds\\sound.mp3");
@@ -227,29 +274,6 @@ namespace AGENTIK {
                 mediaElement.Source = new Uri(path);
                 mediaElement.Play();
 
-            }
-            catch (Exception ex) {
-                _log.Error(ex.Message);
-            }
-        }
-
-        void OnBalloonMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
-            try {
-                MyNotifyIcon.CloseBalloon();
-            }
-            catch (Exception ex) {
-                _log.Error(ex.Message);
-            }
-        }
-
-        void OnBalloonMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-            try {
-                if (Visibility == Visibility.Hidden)
-                    Visibility = Visibility.Visible;
-                else
-                    Activate();
-                MyNotifyIcon.CloseBalloon();
-                RefreshIcon(0, Visibility.Hidden);
             }
             catch (Exception ex) {
                 _log.Error(ex.Message);
@@ -269,26 +293,35 @@ namespace AGENTIK {
         }
 
         private Stream CreateImage() {
-            Visual visual = Application.Current.MainWindow ?? (Visual)VisualTreeHelper.GetParent((DependencyObject)Content);
-            Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
-            Point dpi = m.Transform(new Point(96, 96));
+            try {
+                Visual visual = Application.Current.MainWindow ?? (Visual)VisualTreeHelper.GetParent((DependencyObject)Content);
+                var presentationSource = PresentationSource.FromVisual(visual);
+                if (presentationSource != null && presentationSource.CompositionTarget != null) {
+                    Matrix m = presentationSource.CompositionTarget.TransformToDevice;
+                    Point dpi = m.Transform(new Point(96, 96));
 
-            bool measureValid = _trayIcon.IsMeasureValid;
+                    bool measureValid = _trayIcon.IsMeasureValid;
 
-            if (!measureValid) {
-                var size = new Size(32, 32);
-                _trayIcon.Measure(size);
-                _trayIcon.Arrange(new Rect(size));
+                    if (!measureValid) {
+                        var size = new Size(32, 32);
+                        _trayIcon.Measure(size);
+                        _trayIcon.Arrange(new Rect(size));
+                    }
+
+                    var bmp = new RenderTargetBitmap((int)_trayIcon.RenderSize.Width, (int)_trayIcon.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
+
+                    // this is waiting for dispatcher to perform measure, arrange and render passes
+                    _trayIcon.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+
+                    bmp.Render(_trayIcon);
+
+                    return ConvertToBitmap(bmp);
+                }
             }
-
-            var bmp = new RenderTargetBitmap((int)_trayIcon.RenderSize.Width, (int)_trayIcon.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
-
-            // this is waiting for dispatcher to perform measure, arrange and render passes
-            _trayIcon.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
-
-            bmp.Render(_trayIcon);
-
-            return ConvertToBitmap(bmp);
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
+            return null;
         }
 
         private Stream ConvertToBitmap(RenderTargetBitmap renderTargetBitmap) {
@@ -354,6 +387,22 @@ namespace AGENTIK {
             catch (Exception ex) {
                 _log.Error(ex.Message);
             }
+        }
+
+        private T GetVisualChild<T>(DependencyObject parent) where T : Visual {
+            T child = default(T);
+            int numVisuals = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < numVisuals; i++) {
+                Visual v = (Visual)VisualTreeHelper.GetChild(parent, i);
+                child = v as T;
+                if (child == null) {
+                    child = GetVisualChild<T>(v);
+                }
+                if (child != null) {
+                    break;
+                }
+            }
+            return child;
         }
     }
 }

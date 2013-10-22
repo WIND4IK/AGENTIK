@@ -6,17 +6,14 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using AGENTIK.TaskbarNotification;
 
-namespace AGENTIK
-{
+namespace AGENTIK {
     /// <summary>
     /// Interaction logic for FancyBalloon.xaml
     /// </summary>
-    public partial class FancyBalloon : UserControl
-    {
+    public partial class FancyBalloon : UserControl {
         private bool _isClosing;
 
-        public IEnumerable TreeViewSource
-        {
+        public IEnumerable TreeViewSource {
             get { return _treeView.ItemsSource; }
             set { _treeView.ItemsSource = value; }
         }
@@ -28,8 +25,8 @@ namespace AGENTIK
         /// </summary>
         public static readonly DependencyProperty BalloonTextProperty =
             DependencyProperty.Register("BalloonText",
-                                        typeof (string),
-                                        typeof (FancyBalloon),
+                                        typeof(string),
+                                        typeof(FancyBalloon),
                                         new FrameworkPropertyMetadata(""));
 
         /// <summary>
@@ -37,17 +34,15 @@ namespace AGENTIK
         /// dependency property:<br/>
         /// Description
         /// </summary>
-        public string BalloonText
-        {
-            get { return (string) GetValue(BalloonTextProperty); }
+        public string BalloonText {
+            get { return (string)GetValue(BalloonTextProperty); }
             set { SetValue(BalloonTextProperty, value); }
         }
 
         #endregion
 
 
-        public FancyBalloon()
-        {
+        public FancyBalloon() {
             InitializeComponent();
             TaskbarIcon.AddBalloonClosingHandler(this, OnBalloonClosing);
         }
@@ -57,8 +52,7 @@ namespace AGENTIK
         /// and setting the "Handled" property to true, we suppress the popup
         /// from being closed in order to display the fade-out animation.
         /// </summary>
-        private void OnBalloonClosing(object sender, RoutedEventArgs e)
-        {
+        private void OnBalloonClosing(object sender, RoutedEventArgs e) {
             e.Handled = true;
             _isClosing = true;
         }
@@ -68,8 +62,7 @@ namespace AGENTIK
         /// Resolves the <see cref="TaskbarIcon"/> that displayed
         /// the balloon and requests a close action.
         /// </summary>
-        private void imgClose_MouseDown(object sender, MouseButtonEventArgs e)
-        {
+        private void imgClose_MouseDown(object sender, MouseButtonEventArgs e) {
             //the tray icon assigned this attached property to simplify access
             TaskbarIcon taskbarIcon = TaskbarIcon.GetParentTaskbarIcon(this);
             taskbarIcon.CloseBalloon();
@@ -78,8 +71,7 @@ namespace AGENTIK
         /// <summary>
         /// If the users hovers over the balloon, we don't close it.
         /// </summary>
-        private void grid_MouseEnter(object sender, MouseEventArgs e)
-        {
+        private void grid_MouseEnter(object sender, MouseEventArgs e) {
             //if we're already running the fade-out animation, do not interrupt anymore
             //(makes things too complicated for the sample)
             if (_isClosing) return;
@@ -95,9 +87,8 @@ namespace AGENTIK
         /// The animation was triggered in XAML through the attached
         /// BalloonClosing event.
         /// </summary>
-        private void OnFadeOutCompleted(object sender, EventArgs e)
-        {
-            Popup pp = (Popup) Parent;
+        private void OnFadeOutCompleted(object sender, EventArgs e) {
+            Popup pp = (Popup)Parent;
             pp.IsOpen = false;
         }
     }
