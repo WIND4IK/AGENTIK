@@ -25,15 +25,20 @@ namespace AGENTIK {
         private const string RefreshTimeKey = "RefreshTime";
         private readonly string _applicationName = "AGENTIK";
 
-        public SettingsWindow() {
+        private static SettingsWindow _instance;
+
+        public static SettingsWindow GetWindow() {
+            return _instance ?? (_instance = new SettingsWindow());
+        }
+
+        private SettingsWindow() {
             InitializeComponent();
             _applicationName = Assembly.GetExecutingAssembly().GetName().Name;
             Loaded += SettingsWindowLoaded;
+            LoadDataFromRegistry();
         }
 
         void SettingsWindowLoaded(object sender, RoutedEventArgs e) {
-            LoadDataFromRegistry();
-
             leTheme.ItemsSource = Theme.Themes.ToList().Where(t => !t.Name.Equals(Theme.TouchlineDark.Name)).ToList();
             leTheme.EditValue = ThemeManager.ApplicationThemeName ?? Theme.Office2007Blue.Name;
             leTheme.EditValueChanged += OnLeThemeEditValueChanged;
@@ -53,7 +58,7 @@ namespace AGENTIK {
             set { txtMain.Text = value; }
         }
 
-        public string LogoutAddtess {
+        public string LogoutAddress {
             get { return txtLogout.Text; }
             set { txtLogout.Text = value; }
         }
@@ -93,7 +98,7 @@ namespace AGENTIK {
             }
         }
 
-        protected void LoadDataFromRegistry() {
+        private void LoadDataFromRegistry() {
             try {
                 RegistryKey hklm = Registry.CurrentUser;
                 _registryKey = hklm.CreateSubKey(ApplicationKeyName);
@@ -104,7 +109,7 @@ namespace AGENTIK {
                 if (_registryKey.GetValue(LoginKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LoginKey).ToString()))
                     LoginAddress = _registryKey.GetValue(LoginKey).ToString();
                 if (_registryKey.GetValue(LogoutKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LogoutKey).ToString()))
-                    LogoutAddtess = _registryKey.GetValue(LogoutKey).ToString();
+                    LogoutAddress = _registryKey.GetValue(LogoutKey).ToString();
                 if (_registryKey.GetValue(DataKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LogoutKey).ToString()))
                     DataAddress = _registryKey.GetValue(DataKey).ToString();
                 if (_registryKey.GetValue(RefreshTimeKey) != null)
@@ -125,7 +130,7 @@ namespace AGENTIK {
                     return;
 
                 _registryKey.SetValue(LoginKey, LoginAddress);
-                _registryKey.SetValue(LogoutKey, LogoutAddtess);
+                _registryKey.SetValue(LogoutKey, LogoutAddress);
                 _registryKey.SetValue(DataKey, DataAddress);
                 _registryKey.SetValue(RefreshTimeKey, RefreshTime);
 

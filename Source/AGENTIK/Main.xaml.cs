@@ -48,6 +48,7 @@ namespace AGENTIK {
         private bool _isClose;
 
         private readonly TrayIcon _trayIcon = new TrayIcon();
+        private const string POST = "post";
 
         public MainWindow() {}
 
@@ -66,7 +67,6 @@ namespace AGENTIK {
         void OnMainWindowLoaded(object sender, RoutedEventArgs e) {
             Left = SystemParameters.WorkArea.Width - ActualWidth;
             Top = SystemParameters.WorkArea.Height - ActualHeight;
-            //SizeToContent = SizeToContent.Height;
 
             LoadData();
         }
@@ -115,14 +115,6 @@ namespace AGENTIK {
         }
 
         private void MyNotifyIconOnTrayMouseDoubleClick(object sender, RoutedEventArgs e) {
-            //_balloon = new FancyBalloon();
-            //_balloon.BalloonText = "Мой Секретарь";
-            //_balloon.TreeViewSource = _treeViewSource;
-            //_balloon.ListViewPrioritySource = _tickets.OrderBy(t => t.PriorityId);
-            //_balloon.ListViewStatusSource = _tickets.OrderBy(t => t.StatusId);
-
-            ////show balloon and close it after 4 seconds
-            //MyNotifyIcon.ShowCustomBalloon(_balloon, PopupAnimation.Slide, 4000);
             if (Visibility == Visibility.Hidden) {
                 Show();
                 ShowInTaskbar = true;
@@ -191,7 +183,6 @@ namespace AGENTIK {
                     var typeTickets = _treeViewSource.SelectByType(type);
                     AddNavBarGroup(typeTickets);
                 }
-                AddTimerButtons();
 
                 ShowNotification();
             }
@@ -205,44 +196,8 @@ namespace AGENTIK {
                 var navBarContentTemplate = FindResource("NavBarGroupContentTemplate") as DataTemplate;
                 if (navBarContentTemplate != null) {
                     RowType rowType = viewTickets.First().Children.First().Ticket.RowType;
-                    var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = rowType.Name, ImageSource = GetImageFromUrl(rowType.Icon), ContentTemplate = navBarContentTemplate, Content = viewTickets };
+                    var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = rowType.Name, ImageSource = Helper.GetImageFromUrl(rowType.Icon), ContentTemplate = navBarContentTemplate, Content = viewTickets };
                     navBar.Groups.Add(navBarGroup);
-                }
-            }
-            catch (Exception ex) {
-                _log.Error(ex);
-            }
-        }
-
-        private static BitmapImage GetImageFromUrl(Uri uri) {
-            string file = Path.GetTempFileName();
-            var webClient = new WebClient();
-            webClient.DownloadFile(uri.AbsoluteUri, file);
-            var filepath = Path.GetFullPath(file);
-            var pictureUri = new Uri(filepath, UriKind.Absolute);
-            return new BitmapImage(pictureUri);
-        }
-
-        private void AddTimerButtons() {
-            try {
-                var navBarContentTemplate = FindResource("NavBarGroupContentTemplate") as DataTemplate;
-                if (navBarContentTemplate != null) {
-                    var navBarControl = GetVisualChild<NavBarControl>(navBar);
-                    if (navBarControl != null && navBarControl.View != null) {
-                        var view = navBarControl.View as ExplorerBarView;
-                        //var itemTemplate = view.ItemTemplate;
-
-                        foreach (NavBarGroup navBarGroup in navBar.Groups) {
-                            var viewTickets = navBarGroup.Content as List<ViewTicket>;
-                            foreach (ViewTicket viewTicket in viewTickets) {
-                                var grid = (Grid)navBarGroup.FindName("grid");
-                                //var tt = view.ItemContainerGenerator.ContainerFromItem(navBarItem) as TreeViewItem;
-                                //ContentPresenter myContentPresenter = GetVisualChild<ContentPresenter>(navBarItem);
-                                //DataTemplate myDataTemplate = myContentPresenter.ContentTemplate;
-                                //Grid grid = (Grid)myDataTemplate.FindName("grid", myContentPresenter);
-                            }
-                        }
-                    }
                 }
             }
             catch (Exception ex) {
@@ -315,29 +270,11 @@ namespace AGENTIK {
 
                     bmp.Render(_trayIcon);
 
-                    return ConvertToBitmap(bmp);
+                    return Helper.ConvertToBitmap(bmp);
                 }
             }
             catch (Exception ex) {
                 _log.Error(ex);
-            }
-            return null;
-        }
-
-        private Stream ConvertToBitmap(RenderTargetBitmap renderTargetBitmap) {
-            try {
-
-                var bitmapEncoder = new PngBitmapEncoder();
-                bitmapEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
-
-                var stream = new MemoryStream();
-                bitmapEncoder.Save(stream);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                return stream;
-            }
-            catch (Exception ex) {
-                _log.Error(ex.Message);
             }
             return null;
         }
@@ -370,15 +307,15 @@ namespace AGENTIK {
 
         private void OnSettingsButtonClick(object sender, RoutedEventArgs e) {
             try {
-                var settingsWindow = new SettingsWindow();
+                var settingsWindow = SettingsWindow.GetWindow();
                 settingsWindow.Owner = this;
                 settingsWindow.ShowDialog();
 
                 if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
                     if (settingsWindow.LoginAddress.Length > 0)
                         _baseAddress = new Uri(settingsWindow.LoginAddress);
-                    if (settingsWindow.LogoutAddtess.Length > 0)
-                        _logoutUri = new Uri(settingsWindow.LogoutAddtess);
+                    if (settingsWindow.LogoutAddress.Length > 0)
+                        _logoutUri = new Uri(settingsWindow.LogoutAddress);
                     if (settingsWindow.DataAddress.Length > 0)
                         _dataUri = new Uri(settingsWindow.DataAddress);
                     _interval = settingsWindow.RefreshTime.TimeOfDay;
@@ -389,20 +326,27 @@ namespace AGENTIK {
             }
         }
 
-        private T GetVisualChild<T>(DependencyObject parent) where T : Visual {
-            T child = default(T);
-            int numVisuals = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < numVisuals; i++) {
-                Visual v = (Visual)VisualTreeHelper.GetChild(parent, i);
-                child = v as T;
-                if (child == null) {
-                    child = GetVisualChild<T>(v);
-                }
-                if (child != null) {
-                    break;
+        private void OnTimerButtonClick(object sender, RoutedEventArgs e) {
+            try {
+                var button = sender as Button;
+                if (button != null && button.Tag != null) {
+                    var timerButton = button.Tag as TimerButton;
+                    if (timerButton != null) {
+                        if (timerButton.Method.Equals(POST)) {
+                            using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true}) {
+                                using (var client = new HttpClient(handler) {BaseAddress = _baseAddress}) {
+                                    client.PostAsync(timerButton.Action, new FormUrlEncodedContent(new List<KeyValuePair<string, string>>())).ConfigureAwait(false);
+                                }
+                            }
+                        }
+                        else
+                            Process.Start(timerButton.Action.AbsoluteUri);
+                    }
                 }
             }
-            return child;
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
         }
     }
 }

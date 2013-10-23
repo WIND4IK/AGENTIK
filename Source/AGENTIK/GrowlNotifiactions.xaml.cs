@@ -9,7 +9,6 @@ namespace AGENTIK
     public partial class GrowlNotifiactions
     {
         private const byte MAX_NOTIFICATIONS = 4;
-        private int count;
         private bool _isActive;
         public Notifications Notifications = new Notifications();
         private readonly Notifications buffer = new Notifications();

@@ -60,8 +60,6 @@ namespace AGENTIK
         {
             //For DevExpress DXRibbonWindow lParam = 122413148 on miximazed
             _maximizeCommandRecieved = wParam.ToInt32() == (int)2;
-            if(false)
-                _maximizeCommandRecieved = true;
             return IntPtr.Zero;
         }
     }

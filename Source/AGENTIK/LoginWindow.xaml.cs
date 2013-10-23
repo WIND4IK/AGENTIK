@@ -32,7 +32,7 @@ namespace AGENTIK {
 
         private const string LoginFileName = "AutoLoginData";
 
-        private readonly Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
+        private Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
 
         private static CookieContainer _cookieContainer;
 
@@ -99,6 +99,7 @@ namespace AGENTIK {
         private void Prepare() {
             try {
                 Load();
+                _baseAddress = new Uri(SettingsWindow.GetWindow().LoginAddress);
                 cmbBoxUserName.ItemsSource = _dictionary.Keys.ToList();
             }
             catch (Exception ex) {
@@ -278,5 +279,22 @@ namespace AGENTIK {
             DisableAutoLogin = true;
             TryLogin();
         }
+
+        private void OnSettingsButtonClick(object sender, RoutedEventArgs e) {
+            try {
+                var settingsWindow = SettingsWindow.GetWindow();
+                settingsWindow.Owner = this;
+                settingsWindow.ShowDialog();
+
+                if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
+                    if (settingsWindow.LoginAddress.Length > 0)
+                        _baseAddress = new Uri(settingsWindow.LoginAddress);
+                }
+            }
+            catch (Exception ex) {
+                _log.Error(ex.Message);
+            }
+        }
+
     }
 }

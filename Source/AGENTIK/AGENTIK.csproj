@@ -265,6 +265,7 @@
     <Compile Include="GrowlNotifiactions.xaml.cs">
       <DependentUpon>GrowlNotifiactions.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helper.cs" />
     <Compile Include="HyperlinkNavigationBehavior.cs" />
     <Compile Include="MaximizeBehavior.cs" />
     <Compile Include="SettingsWindow.xaml.cs">

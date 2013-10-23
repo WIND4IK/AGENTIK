@@ -39,6 +39,8 @@ namespace AGENTIK
 
         public Uri Uri { get { return _ticket != null ? _ticket.RowType.Uri : null; } }
 
+        public List<TimerButton> TimerButtons {get { return _ticket != null ? _ticket.Buttons : new List<TimerButton>(); }} 
+
         public string Title { get; set; }
 
         public List<ViewTicket> Children { get; set; }
@@ -410,12 +412,12 @@ namespace AGENTIK
         /// <param name="reader">The <see cref="T:System.Xml.XmlReader" /> stream from which the object is deserialized.</param>
         void IXmlSerializable.ReadXml(XmlReader reader) {
             XElement element = XElement.Load(reader);
-            Action = element.Element(ActionElementName).TryGetValue();
+            Action = new Uri(HttpUtility.HtmlDecode(element.Element(ActionElementName).TryGetValue()));
             Icon = new Uri(HttpUtility.HtmlDecode(element.Element(IconElementName).TryGetValue()));
             Method = element.Element(MethodElementName).TryGetValue();
         }
 
-        public string Action { get; internal set; }
+        public Uri Action { get; internal set; }
 
         public Uri Icon { get; internal set; }
 
