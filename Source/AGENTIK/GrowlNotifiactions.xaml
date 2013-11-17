@@ -12,7 +12,7 @@
         </Storyboard>
         <DataTemplate x:Key="MessageTemplate" DataType="agentik:Ticket">
             <Grid x:Name="NotificationWindow" Tag="{Binding Path=RowProperty.Number}" Background="Transparent" SizeChanged="NotificationWindowSizeChanged" MouseUp="NotificationWindowMouseUp">
-                <Border Name="border" Background="#2a3345" BorderThickness="0" CornerRadius="10" Margin="10">
+                <Border Name="border" Background="#FFB6D6FF" BorderThickness="0" CornerRadius="10" Margin="10">
                     <Border.Effect>
                         <DropShadowEffect ShadowDepth="0" Opacity="0.8" BlurRadius="10"/>
                     </Border.Effect>
@@ -25,11 +25,11 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Image Grid.RowSpan="2" Source="{Binding Path=RowType.Icon}" Margin="4" Width="80"></Image>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=RowProperty.Contractor.Name}"  TextOptions.TextRenderingMode="ClearType" TextOptions.TextFormattingMode="Display" Foreground="White" 
+                        <Image Source="{Binding Path=RowType.Icon}" Margin="4" Width="32"></Image>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=RowProperty.Contractor.Name}"  TextOptions.TextRenderingMode="ClearType" TextOptions.TextFormattingMode="Display" Foreground="Black" 
                                    FontFamily="Arial" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"  Margin="2,4,4,2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
                         <Button x:Name="CloseButton" Grid.Row="0" Grid.Column="1" Width="16" Height="16" HorizontalAlignment="Right" Margin="0,0,12,0" Style="{StaticResource CloseButton}" VerticalAlignment="Top" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=RowType.Theme}"  TextOptions.TextRenderingMode="ClearType" TextOptions.TextFormattingMode="Display" Foreground="White" 
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=RowType.Theme}"  TextOptions.TextRenderingMode="ClearType" TextOptions.TextFormattingMode="Display" Foreground="Black" 
                                    FontFamily="Arial" VerticalAlignment="Center"  Margin="2,2,4,4" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </Border>

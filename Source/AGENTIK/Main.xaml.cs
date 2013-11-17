@@ -10,19 +10,16 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using DevExpress.Data.PLinq.Helpers;
+using AGENTIK.Resources;
 using DevExpress.Xpf.Core;
 using DevExpress.Xpf.NavBar;
 using log4net;
-using Updater;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
@@ -37,7 +34,6 @@ namespace AGENTIK {
         private Uri _baseAddress = new Uri("http://skylogic.mysecretar.com/mys");
         private Uri _logoutUri = new Uri("http://skylogic.mysecretar.com/mys/logout");
         private Uri _dataUri = new Uri("http://skylogic.mysecretar.com/mys/xml");
-        private TimeSpan _interval = new TimeSpan(0, 5, 0);
 
         private static CookieContainer _cookieContainer;
 
@@ -50,6 +46,8 @@ namespace AGENTIK {
         private readonly TrayIcon _trayIcon = new TrayIcon();
         private const string POST = "post";
 
+        private DispatcherTimer _dispatcherTimer;
+
         public MainWindow() {}
 
         public MainWindow(CookieContainer cookieContainer) {
@@ -57,6 +55,10 @@ namespace AGENTIK {
 
             _cookieContainer = cookieContainer;
 
+            _baseAddress = RegistryHelper.LoginAddress.TryGetValidUri();
+            _logoutUri = RegistryHelper.LogoutAddress.TryGetValidUri();
+            _dataUri = RegistryHelper.DataAddress.TryGetValidUri();
+            
             _treeViewSource = new List<ViewTicket>();
 
             _tickets = new List<Ticket>();
@@ -74,10 +76,10 @@ namespace AGENTIK {
         private void LoadData() {
             try {
                 RefreshData();
-                var dispatcherTimer = new DispatcherTimer();
-                dispatcherTimer.Tick += Callback;
-                dispatcherTimer.Interval = _interval;
-                dispatcherTimer.Start();
+                _dispatcherTimer = new DispatcherTimer();
+                _dispatcherTimer.Tick += Callback;
+                _dispatcherTimer.Interval = RegistryHelper.RefreshTime.TimeOfDay;
+                _dispatcherTimer.Start();
             }
             catch (Exception ex) {
                 _log.Error(ex);
@@ -88,7 +90,7 @@ namespace AGENTIK {
         private async void Logout() {
             try {
                 using (var handler = new HttpClientHandler { CookieContainer = _cookieContainer, UseCookies = true }) {
-                    using (var client = new HttpClient(handler) { BaseAddress = _baseAddress }) {
+                    using (var client = new HttpClient(handler) { BaseAddress = _logoutUri }) {
                         var requestMessage = new HttpRequestMessage { Method = HttpMethod.Get };
                         HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
                         response.EnsureSuccessStatusCode();
@@ -104,6 +106,9 @@ namespace AGENTIK {
             if (_isClose) {
                 //clean up notifyicon (would otherwise stay open until application finishes)
                 MyNotifyIcon.Dispose();
+                
+                _dispatcherTimer.Stop();
+                _dispatcherTimer = null;
 
                 base.OnClosing(e);
             }
@@ -307,18 +312,17 @@ namespace AGENTIK {
 
         private void OnSettingsButtonClick(object sender, RoutedEventArgs e) {
             try {
-                var settingsWindow = SettingsWindow.GetWindow();
+                var settingsWindow = new SettingsWindow();
                 settingsWindow.Owner = this;
                 settingsWindow.ShowDialog();
 
                 if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
                     if (settingsWindow.LoginAddress.Length > 0)
-                        _baseAddress = new Uri(settingsWindow.LoginAddress);
+                        _baseAddress = settingsWindow.LoginAddress.TryGetValidUri();
                     if (settingsWindow.LogoutAddress.Length > 0)
-                        _logoutUri = new Uri(settingsWindow.LogoutAddress);
+                        _logoutUri = settingsWindow.LogoutAddress.TryGetValidUri();
                     if (settingsWindow.DataAddress.Length > 0)
-                        _dataUri = new Uri(settingsWindow.DataAddress);
-                    _interval = settingsWindow.RefreshTime.TimeOfDay;
+                        _dataUri = settingsWindow.DataAddress.TryGetValidUri();
                 }
             }
             catch (Exception ex) {
@@ -335,7 +339,8 @@ namespace AGENTIK {
                         if (timerButton.Method.Equals(POST)) {
                             using (var handler = new HttpClientHandler {CookieContainer = _cookieContainer, UseCookies = true}) {
                                 using (var client = new HttpClient(handler) {BaseAddress = _baseAddress}) {
-                                    client.PostAsync(timerButton.Action, new FormUrlEncodedContent(new List<KeyValuePair<string, string>>())).ConfigureAwait(false);
+                                    client.GetAsync(timerButton.Action).ConfigureAwait(false);
+                                    RefreshData();
                                 }
                             }
                         }

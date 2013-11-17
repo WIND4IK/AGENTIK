@@ -21,6 +21,13 @@ namespace AGENTIK {
             return xElement != null ? DateTime.Parse(xElement.Value) : DateTime.MinValue;
         }
 
+        public static Uri TryGetValidUri(this string url) {
+            if (!(url.StartsWith(@"http://") || url.StartsWith(@"http://"))) {
+                url = @"http://" + url;
+            }
+            return new Uri(url);
+        }
+
         public static List<ViewTicket> SelectByType(this List<ViewTicket> source, string type) {
             var list = new List<ViewTicket>();
             foreach (var viewTicket in source.ToList()) {

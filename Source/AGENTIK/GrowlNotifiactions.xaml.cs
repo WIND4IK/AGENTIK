@@ -52,7 +52,7 @@ namespace AGENTIK
             
             //Close window if there's nothing to show
             if (Notifications.Count < 1) {
-                Hide();
+                Close();
                 _isActive = false;
             }
         }

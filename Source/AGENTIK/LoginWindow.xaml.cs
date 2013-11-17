@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
+using AGENTIK.Resources;
 using DevExpress.Xpf.Core;
 using DevExpress.Xpf.Ribbon;
 using log4net;
@@ -99,7 +100,7 @@ namespace AGENTIK {
         private void Prepare() {
             try {
                 Load();
-                _baseAddress = new Uri(SettingsWindow.GetWindow().LoginAddress);
+                _baseAddress = RegistryHelper.LoginAddress.TryGetValidUri();
                 cmbBoxUserName.ItemsSource = _dictionary.Keys.ToList();
             }
             catch (Exception ex) {
@@ -282,13 +283,13 @@ namespace AGENTIK {
 
         private void OnSettingsButtonClick(object sender, RoutedEventArgs e) {
             try {
-                var settingsWindow = SettingsWindow.GetWindow();
+                var settingsWindow = new SettingsWindow();
                 settingsWindow.Owner = this;
                 settingsWindow.ShowDialog();
 
                 if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
                     if (settingsWindow.LoginAddress.Length > 0)
-                        _baseAddress = new Uri(settingsWindow.LoginAddress);
+                        _baseAddress = settingsWindow.LoginAddress.TryGetValidUri();
                 }
             }
             catch (Exception ex) {

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using AGENTIK.Resources;
 using DevExpress.Xpf.Core;
 using DevExpress.Xpf.Grid.LookUp;
 using DevExpress.Xpf.Ribbon;
@@ -15,34 +16,21 @@ namespace AGENTIK {
     public partial class SettingsWindow : DXRibbonWindow {
         private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public const string ApplicationKeyName = "Software\\AGENTIK";
-
-        private RegistryKey _registryKey;
-
-        private const string LoginKey = "LoginUri";
-        private const string LogoutKey = "LogoutUri";
-        private const string DataKey = "DataUri";
-        private const string RefreshTimeKey = "RefreshTime";
-        private readonly string _applicationName = "AGENTIK";
-
-        private static SettingsWindow _instance;
-
-        public static SettingsWindow GetWindow() {
-            return _instance ?? (_instance = new SettingsWindow());
-        }
-
-        private SettingsWindow() {
+        public SettingsWindow() {
             InitializeComponent();
-            _applicationName = Assembly.GetExecutingAssembly().GetName().Name;
             Loaded += SettingsWindowLoaded;
-            LoadDataFromRegistry();
         }
 
         void SettingsWindowLoaded(object sender, RoutedEventArgs e) {
             leTheme.ItemsSource = Theme.Themes.ToList().Where(t => !t.Name.Equals(Theme.TouchlineDark.Name)).ToList();
             leTheme.EditValue = ThemeManager.ApplicationThemeName ?? Theme.Office2007Blue.Name;
             leTheme.EditValueChanged += OnLeThemeEditValueChanged;
-            chbStart.IsChecked = IsInStartUp();
+            
+            IsStartup = RegistryHelper.IsStartUp;
+            LoginAddress = RegistryHelper.LoginAddress;
+            LogoutAddress = RegistryHelper.LogoutAddress;
+            DataAddress = RegistryHelper.DataAddress;
+            RefreshTime = RegistryHelper.RefreshTime;
         }
 
         void OnLeThemeEditValueChanged(object sender, RoutedEventArgs e) {
@@ -73,78 +61,21 @@ namespace AGENTIK {
             set { timePicker.DateTime = value; }
         }
 
-        private bool IsInStartUp() {
-            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false);
-            return registryKey.GetValue(_applicationName) != null;
-        }
-
-        private void RegisterInStartup(bool isChecked) {
-            try {
-                RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                if (isChecked) {
-                    var address = Assembly.GetExecutingAssembly().Location;
-                    registryKey.SetValue(_applicationName, address);
-                }
-                else {
-                    var exist = registryKey.GetValue(_applicationName);
-                    if (exist != null)
-                        registryKey.DeleteValue(_applicationName);
-                }
-
-            }
-            catch (Exception ex) {
-                _log.Error(ex.Message);
-                MessageBox.Show("Ошибка!", "Внимание", MessageBoxButton.OK);
-            }
-        }
-
-        private void LoadDataFromRegistry() {
-            try {
-                RegistryKey hklm = Registry.CurrentUser;
-                _registryKey = hklm.CreateSubKey(ApplicationKeyName);
-
-                if (_registryKey == null)
-                    return;
-
-                if (_registryKey.GetValue(LoginKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LoginKey).ToString()))
-                    LoginAddress = _registryKey.GetValue(LoginKey).ToString();
-                if (_registryKey.GetValue(LogoutKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LogoutKey).ToString()))
-                    LogoutAddress = _registryKey.GetValue(LogoutKey).ToString();
-                if (_registryKey.GetValue(DataKey) != null && !String.IsNullOrEmpty(_registryKey.GetValue(LogoutKey).ToString()))
-                    DataAddress = _registryKey.GetValue(DataKey).ToString();
-                if (_registryKey.GetValue(RefreshTimeKey) != null)
-                    RefreshTime = DateTime.Parse(_registryKey.GetValue(RefreshTimeKey).ToString());
-            }
-            catch (Exception ex) {
-                _log.Error(ex.Message);
-                MessageBox.Show("Ошибка при загрузке данных из реестра", "Внимание", MessageBoxButton.OK);
-            }
-        }
-
-        protected void SaveDataFromRegistry() {
-            try {
-                RegistryKey hklm = Registry.CurrentUser;
-                _registryKey = hklm.CreateSubKey(ApplicationKeyName);
-
-                if (_registryKey == null)
-                    return;
-
-                _registryKey.SetValue(LoginKey, LoginAddress);
-                _registryKey.SetValue(LogoutKey, LogoutAddress);
-                _registryKey.SetValue(DataKey, DataAddress);
-                _registryKey.SetValue(RefreshTimeKey, RefreshTime);
-
-                var isChecked = chbStart.IsChecked.HasValue && chbStart.IsChecked.Value;
-                RegisterInStartup(isChecked);
-            }
-            catch (Exception ex) {
-                _log.Error(ex.Message);
-                MessageBox.Show("Ошибка при сохранении настроек", "Внимание", MessageBoxButton.OK);
-            }
+        public bool IsStartup {
+            get { return chbStart.IsChecked.HasValue && chbStart.IsChecked.Value; }
+            set { chbStart.IsChecked = value; }
         }
 
         private void OnSaveButtonClick(object sender, RoutedEventArgs e) {
-            SaveDataFromRegistry();
+            DialogResult = true;
+
+            RegistryHelper.IsStartUp = IsStartup;
+            RegistryHelper.LoginAddress = LoginAddress;
+            RegistryHelper.LogoutAddress = LogoutAddress;
+            RegistryHelper.DataAddress = DataAddress;
+            RegistryHelper.RefreshTime = RefreshTime;
+
+            RegistryHelper.SaveDataFromRegistry();
             Close();
         }
 
