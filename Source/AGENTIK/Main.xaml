@@ -9,6 +9,7 @@
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tbn="clr-namespace:AGENTIK.TaskbarNotification;assembly=AGENTIK.TaskbarNotification"
+             xmlns:resources="clr-namespace:AGENTIK.Resources"
              x:Name="Main"
              Title="AGENTIK"
              Width="400"
@@ -170,7 +171,7 @@
                                                 VerticalAlignment="Center" Margin="0,0,5,0">
                                         <Hyperlink NavigateUri="{Binding Content.Uri}" TextDecorations="{x:Null}" Foreground="{Binding}">
                                             <i:Interaction.Behaviors>
-                                                <agentik:HyperlinkNavigationBehavior />
+                                                <resources:HyperlinkNavigationBehavior />
                                             </i:Interaction.Behaviors>
                                             <Run Text="{Binding Content.Title}" ToolTip="{Binding Content.Title}" />
                                         </Hyperlink>

@@ -8,6 +8,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using AGENTIK.Resources;
 
 namespace AGENTIK
 {

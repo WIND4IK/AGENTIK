@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Huddled.Interop;
 using Huddled.Interop.Windows;
 using Huddled.Wpf;
-using MessageMapping = System.Collections.Generic.KeyValuePair<Huddled.Interop.NativeMethods.WindowMessage, Huddled.Interop.NativeMethods.MessageHandler>;
 
-namespace AGENTIK
+namespace AGENTIK.Resources
 {
     public class MaximizeBehavior : NativeBehavior
     {
         private bool _maximizeCommandRecieved;
 
-        protected override IEnumerable<MessageMapping> Handlers
+        protected override IEnumerable<KeyValuePair<NativeMethods.WindowMessage, NativeMethods.MessageHandler>> Handlers
         {
             get
             {
-                yield return new MessageMapping(NativeMethods.WindowMessage.WindowPositionChanging, OnPreviewPositionChange);
-                yield return new MessageMapping(NativeMethods.WindowMessage.SysCommand, OnSysCommand);
-                yield return new MessageMapping(NativeMethods.WindowMessage.SysChar, OnGetMinMaxInfo);
+                yield return new KeyValuePair<NativeMethods.WindowMessage, NativeMethods.MessageHandler>(NativeMethods.WindowMessage.WindowPositionChanging, OnPreviewPositionChange);
+                yield return new KeyValuePair<NativeMethods.WindowMessage, NativeMethods.MessageHandler>(NativeMethods.WindowMessage.SysCommand, OnSysCommand);
+                yield return new KeyValuePair<NativeMethods.WindowMessage, NativeMethods.MessageHandler>(NativeMethods.WindowMessage.SysChar, OnGetMinMaxInfo);
             }
         }
 

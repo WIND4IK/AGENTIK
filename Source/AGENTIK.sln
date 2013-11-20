@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20827.3
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotifyIconWpf", "NotifyIconWpf\NotifyIconWpf.csproj", "{7AC63864-7638-41C4-969C-D3197EF2BED9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGENTIK", "AGENTIK\AGENTIK.csproj", "{71C74F29-F1C2-49C5-969F-C25AC4CDFCCC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Updater", "Updater\Updater.csproj", "{46FB8134-0AAE-4E81-9B95-65DC9FDAA330}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFGrowlNotification", "C:\Users\Denis\Desktop\WPFGrowlNotification-master\WPFGrowlNotification\WPFGrowlNotification.csproj", "{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,16 +48,6 @@ Global
 		{46FB8134-0AAE-4E81-9B95-65DC9FDAA330}.Release|Any CPU.Build.0 = Release|Any CPU
 		{46FB8134-0AAE-4E81-9B95-65DC9FDAA330}.SingleImage|Any CPU.ActiveCfg = Release|Any CPU
 		{46FB8134-0AAE-4E81-9B95-65DC9FDAA330}.SingleImage|Any CPU.Build.0 = Release|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.CD_ROM|Any CPU.ActiveCfg = Release|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.CD_ROM|Any CPU.Build.0 = Release|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.DVD-5|Any CPU.ActiveCfg = Debug|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.DVD-5|Any CPU.Build.0 = Debug|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.SingleImage|Any CPU.ActiveCfg = Release|Any CPU
-		{6995ABFD-720F-41E7-BE8B-38F23BA4BB57}.SingleImage|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

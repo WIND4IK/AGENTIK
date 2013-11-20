@@ -12,10 +12,10 @@
     <ROW Property="ARPCOMMENTS" Value="Эта база данных установщика содержит логику и данные, необходимые для установки [|ProductName]." ValueLocId="*"/>
     <ROW Property="MSIFASTINSTALL" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="Manufacturer" Value="AGENTIK" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1049:{5D72C66F-A496-4C5B-B1B2-3ED350D6F810} " Type="16"/>
+    <ROW Property="ProductCode" Value="1049:{A9900C2F-11F0-4906-9EBD-BF78A5DD24BA} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1049"/>
     <ROW Property="ProductName" Value="AGENTIK" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.0.33" Type="32"/>
+    <ROW Property="ProductVersion" Value="1.0.35" Type="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{48F8F8F1-1635-4E10-AB25-B814E1576A99}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
