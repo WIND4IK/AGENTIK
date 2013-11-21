@@ -58,6 +58,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Page Include="ChatUserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChatUsersList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GrowlNotifiactions.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -186,6 +194,9 @@
     <Reference Include="Huddled.Interop">
       <HintPath>..\libs\Huddled.Interop.dll</HintPath>
     </Reference>
+    <Reference Include="jabber-net">
+      <HintPath>..\libs\jabber-net.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\libs\log4net.dll</HintPath>
     </Reference>
@@ -259,9 +270,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChatUserWindow.xaml.cs">
+      <DependentUpon>ChatUserWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChatUsersList.xaml.cs">
+      <DependentUpon>ChatUsersList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GrowlNotifiactions.xaml.cs">
       <DependentUpon>GrowlNotifiactions.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\ChatUser.cs" />
+    <Compile Include="Models\Ticket.cs" />
     <Compile Include="Resources\Extensions.cs" />
     <Compile Include="Resources\Helper.cs" />
     <Compile Include="Resources\HyperlinkNavigationBehavior.cs" />
@@ -270,7 +289,6 @@
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Ticket.cs" />
     <Compile Include="TrayIcon.xaml.cs">
       <DependentUpon>TrayIcon.xaml</DependentUpon>
     </Compile>

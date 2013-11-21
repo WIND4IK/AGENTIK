@@ -4,13 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:agentik="clr-namespace:AGENTIK"
+        xmlns:models="clr-namespace:AGENTIK.Models"
         mc:Ignorable="d"
         Title="GrowlNotifiactions" Height="530" Width="300" ShowActivated="False" AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False" Background="Transparent" Topmost="True" UseLayoutRounding="True">
     <Window.Resources>
         <Storyboard x:Key="CollapseStoryboard">
             <DoubleAnimation From="100" To="0" Storyboard.TargetProperty="Height" Duration="0:0:1"/>
         </Storyboard>
-        <DataTemplate x:Key="MessageTemplate" DataType="agentik:Ticket">
+        <DataTemplate x:Key="MessageTemplate" DataType="models:Ticket">
             <Grid x:Name="NotificationWindow" Tag="{Binding Path=RowProperty.Number}" Background="Transparent" SizeChanged="NotificationWindowSizeChanged" MouseUp="NotificationWindowMouseUp">
                 <Border Name="border" Background="#FFB6D6FF" BorderThickness="0" CornerRadius="10" Margin="10">
                     <Border.Effect>

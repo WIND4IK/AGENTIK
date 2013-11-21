@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Xml;
@@ -10,7 +9,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using AGENTIK.Resources;
 
-namespace AGENTIK
+namespace AGENTIK.Models
 {
     public class Notifications : ObservableCollection<Ticket> { }
 

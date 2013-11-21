@@ -1,0 +1,9 @@
+﻿<Window x:Class="AGENTIK.ChatUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ChatUser" Height="300" Width="300">
+    <Grid>
+        <RichTextBox x:Name="receiveTextBox" VerticalAlignment="Top" Height="205"/>
+        <RichTextBox x:Name="sendTextBox" Height="60" VerticalAlignment="Bottom" VerticalScrollBarVisibility="Auto" KeyUp="sendTextBox_KeyUp" />
+    </Grid>
+</Window>

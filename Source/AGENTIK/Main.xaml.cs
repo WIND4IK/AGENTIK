@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using AGENTIK.Models;
 using AGENTIK.Resources;
 using DevExpress.Xpf.Core;
 using DevExpress.Xpf.NavBar;
@@ -352,6 +353,11 @@ namespace AGENTIK {
             catch (Exception ex) {
                 _log.Error(ex);
             }
+        }
+
+        private void OnChatButtonClick(object sender, RoutedEventArgs e) {
+            var window = new ChatUsersList();
+            window.Show();
         }
     }
 }

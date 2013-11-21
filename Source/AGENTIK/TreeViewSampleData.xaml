@@ -2,32 +2,33 @@
                                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                   xmlns:agentik="clr-namespace:AGENTIK"
                                   xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System"
-                                  x:TypeArguments="agentik:ViewTicket">
+                                  xmlns:models="clr-namespace:AGENTIK.Models"
+                                  x:TypeArguments="models:ViewTicket">
 
 
-    <agentik:ViewTicket Title="Название организации1">
-        <agentik:ViewTicket.Children>
-            <agentik:ViewTicket Title="Название1" />
-            <agentik:ViewTicket Title="Название2" />
-            <agentik:ViewTicket Title="Название3" />
-            <agentik:ViewTicket Title="Название4" />
-        </agentik:ViewTicket.Children>
-    </agentik:ViewTicket>
-    <agentik:ViewTicket Title="Название организации2">
-        <agentik:ViewTicket.Children>
-            <agentik:ViewTicket Title="Название1" />
-            <agentik:ViewTicket Title="Название2" />
-            <agentik:ViewTicket Title="Название3" />
-            <agentik:ViewTicket Title="Название4" />
-        </agentik:ViewTicket.Children>
-    </agentik:ViewTicket>
-    <agentik:ViewTicket Title="Название организации3">
-        <agentik:ViewTicket.Children>
-            <agentik:ViewTicket Title="Название1" />
-            <agentik:ViewTicket Title="Название2" />
-            <agentik:ViewTicket Title="Название3" />
-            <agentik:ViewTicket Title="Название4" />
-        </agentik:ViewTicket.Children>
-    </agentik:ViewTicket>
+    <models:ViewTicket Title="Название организации1">
+        <models:ViewTicket.Children>
+            <models:ViewTicket Title="Название1" />
+            <models:ViewTicket Title="Название2" />
+            <models:ViewTicket Title="Название3" />
+            <models:ViewTicket Title="Название4" />
+        </models:ViewTicket.Children>
+    </models:ViewTicket>
+    <models:ViewTicket Title="Название организации2">
+        <models:ViewTicket.Children>
+            <models:ViewTicket Title="Название1" />
+            <models:ViewTicket Title="Название2" />
+            <models:ViewTicket Title="Название3" />
+            <models:ViewTicket Title="Название4" />
+        </models:ViewTicket.Children>
+    </models:ViewTicket>
+    <models:ViewTicket Title="Название организации3">
+        <models:ViewTicket.Children>
+            <models:ViewTicket Title="Название1" />
+            <models:ViewTicket Title="Название2" />
+            <models:ViewTicket Title="Название3" />
+            <models:ViewTicket Title="Название4" />
+        </models:ViewTicket.Children>
+    </models:ViewTicket>
 
 </objectModel:ObservableCollection>
