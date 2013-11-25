@@ -268,7 +268,6 @@
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
                             BorderThickness="0"
-                            Click="OnChatButtonClick"
                             Padding="3">
                         <Image Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Navigation/Home_32x32.png" />
                     </Button>
@@ -309,10 +308,13 @@
                     <dxn:NavBarControl.View>
                         <dxn:NavigationPaneView dxn:ScrollingSettings.ScrollMode="Buttons" MaxVisibleGroupCount="0" />
                     </dxn:NavBarControl.View>
-                    <!--<dxn:NavBarGroup DisplaySource="Content"
+                    <dxn:NavBarGroup DisplaySource="Content"
                                      Header="Задания"
-                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Tasks/Task_32x32.png"
-                                     ContentTemplate="{DynamicResource NavBarGroupContentTemplate}"/>-->
+                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Tasks/Task_32x32.png">
+                        <dxn:NavBarGroup.Content>
+                            <agentik:ChatUsersList />
+                        </dxn:NavBarGroup.Content>
+                    </dxn:NavBarGroup>
                 </dxn:NavBarControl>
             </Grid>
         </Grid>

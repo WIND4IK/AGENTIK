@@ -45,7 +45,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -58,11 +58,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Page Include="ChatUserWindow.xaml">
+    <Page Include="ChatUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ChatUsersList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChatWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -105,11 +109,16 @@
       <HintPath>C:\Program Files (x86)\DevExpress\DXperience 13.1\Bin\Framework\DevExpress.Xpf.Core.v13.1.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DevExpress.Xpf.Docking.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="devexpress.xpf.grid.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.Xpf.Grid.v13.1.Core, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Layout.v13.1.Core, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\DevExpress\DXperience 13.1\Bin\Framework\DevExpress.Xpf.Layout.v13.1.Core.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Xpf.NavBar.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -203,6 +212,9 @@
     <Reference Include="Microsoft.CSharp">
       <Private>True</Private>
     </Reference>
+    <Reference Include="netlib.Dns">
+      <HintPath>..\libs\netlib.Dns.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero">
       <Private>True</Private>
     </Reference>
@@ -231,15 +243,15 @@
     <Reference Include="System.Web">
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Expression\Blend\.NETFramework\v4.5\Libraries\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml">
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase">
@@ -253,6 +265,9 @@
     <Reference Include="PresentationFramework">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="zlib.net">
+      <HintPath>..\libs\zlib.net.dll</HintPath>
     </Reference>
     <Resource Include="Icons\Inactive.ico" />
     <Resource Include="Icons\Error.ico" />
@@ -270,16 +285,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ChatUserWindow.xaml.cs">
-      <DependentUpon>ChatUserWindow.xaml</DependentUpon>
+    <Compile Include="ChatUserControl.xaml.cs">
+      <DependentUpon>ChatUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ChatUsersList.xaml.cs">
       <DependentUpon>ChatUsersList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChatWindow.xaml.cs">
+      <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="GrowlNotifiactions.xaml.cs">
       <DependentUpon>GrowlNotifiactions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\ChatUser.cs" />
+    <Compile Include="Models\Message.cs" />
     <Compile Include="Models\Ticket.cs" />
     <Compile Include="Resources\Extensions.cs" />
     <Compile Include="Resources\Helper.cs" />

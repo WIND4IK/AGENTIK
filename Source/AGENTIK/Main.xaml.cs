@@ -190,6 +190,9 @@ namespace AGENTIK {
                     AddNavBarGroup(typeTickets);
                 }
 
+                //Add Chat NavBarGroup
+                AddChatNavBarGroup();
+
                 ShowNotification();
             }
             catch (Exception ex) {
@@ -205,6 +208,16 @@ namespace AGENTIK {
                     var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = rowType.Name, ImageSource = Helper.GetImageFromUrl(rowType.Icon), ContentTemplate = navBarContentTemplate, Content = viewTickets };
                     navBar.Groups.Add(navBarGroup);
                 }
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
+        }
+
+        private void AddChatNavBarGroup() {
+            try {
+                var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = "Онлайн-консультант", ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/Eye.png")), Content = new ChatUsersList{VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch} };
+                navBar.Groups.Add(navBarGroup);
             }
             catch (Exception ex) {
                 _log.Error(ex);
@@ -353,11 +366,6 @@ namespace AGENTIK {
             catch (Exception ex) {
                 _log.Error(ex);
             }
-        }
-
-        private void OnChatButtonClick(object sender, RoutedEventArgs e) {
-            var window = new ChatUsersList();
-            window.Show();
         }
     }
 }
