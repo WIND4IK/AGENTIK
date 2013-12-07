@@ -10,6 +10,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tbn="clr-namespace:AGENTIK.TaskbarNotification;assembly=AGENTIK.TaskbarNotification"
              xmlns:resources="clr-namespace:AGENTIK.Resources"
+             xmlns:controls="clr-namespace:AGENTIK.Controls"
              x:Name="Main"
              Title="AGENTIK"
              Width="400"
@@ -308,13 +309,6 @@
                     <dxn:NavBarControl.View>
                         <dxn:NavigationPaneView dxn:ScrollingSettings.ScrollMode="Buttons" MaxVisibleGroupCount="0" />
                     </dxn:NavBarControl.View>
-                    <dxn:NavBarGroup DisplaySource="Content"
-                                     Header="Задания"
-                                     ImageSource="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Tasks/Task_32x32.png">
-                        <dxn:NavBarGroup.Content>
-                            <agentik:ChatUsersList />
-                        </dxn:NavBarGroup.Content>
-                    </dxn:NavBarGroup>
                 </dxn:NavBarControl>
             </Grid>
         </Grid>

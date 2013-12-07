@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using AGENTIK.Controls;
 using AGENTIK.Models;
 using AGENTIK.Resources;
 using DevExpress.Xpf.Core;
@@ -77,6 +78,9 @@ namespace AGENTIK {
         private void LoadData() {
             try {
                 RefreshData();
+                //Add Chat NavBarGroup
+                AddChatNavBarGroup();
+
                 _dispatcherTimer = new DispatcherTimer();
                 _dispatcherTimer.Tick += Callback;
                 _dispatcherTimer.Interval = RegistryHelper.RefreshTime.TimeOfDay;
@@ -183,15 +187,35 @@ namespace AGENTIK {
                     _treeViewSource.Add(maitTicket);
                 }
 
-                navBar.Groups.Clear();
+                var existingTypes = navBar.Groups.Where(t => t.Tag != null).Select(t => t.Tag.ToString()).ToList();
                 var types = _tickets.Where(t => !String.IsNullOrEmpty(t.RowType.TypeRow)).Select(t => t.RowType.TypeRow).Distinct().ToList();
-                foreach (var type in types) {
+
+                var newTypes = types.Except(existingTypes).ToList();
+                var oldTypes = existingTypes.Except(types).ToList();
+
+                var activeNavBarGroup = navBar.Groups.FirstOrDefault(t => t.IsActive);
+
+                foreach (var type in newTypes) {
                     var typeTickets = _treeViewSource.SelectByType(type);
                     AddNavBarGroup(typeTickets);
                 }
 
-                //Add Chat NavBarGroup
-                AddChatNavBarGroup();
+                foreach (var type in oldTypes) {
+                    var navBarGroup = navBar.Groups.First(t => t.Tag.ToString().Equals(type));
+                    navBar.Groups.Remove(navBarGroup);
+                }
+
+                foreach (var type in types) {
+                    if (existingTypes.Contains(type)) {
+                        var typeTickets = _treeViewSource.SelectByType(type);
+                        var navBarGroup = navBar.Groups.First(t => t.Tag.ToString().Equals(type));
+                        navBarGroup.Content = typeTickets;
+                    }
+                }
+
+                if (activeNavBarGroup != null && navBar.Groups.Contains(activeNavBarGroup)) {
+                    navBar.ActiveGroup = activeNavBarGroup;
+                }
 
                 ShowNotification();
             }
@@ -205,7 +229,7 @@ namespace AGENTIK {
                 var navBarContentTemplate = FindResource("NavBarGroupContentTemplate") as DataTemplate;
                 if (navBarContentTemplate != null) {
                     RowType rowType = viewTickets.First().Children.First().Ticket.RowType;
-                    var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = rowType.Name, ImageSource = Helper.GetImageFromUrl(rowType.Icon), ContentTemplate = navBarContentTemplate, Content = viewTickets };
+                    var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = rowType.Name, ImageSource = Helper.GetImageFromUrl(rowType.Icon), ContentTemplate = navBarContentTemplate, Content = viewTickets, Tag = rowType.TypeRow };
                     navBar.Groups.Add(navBarGroup);
                 }
             }
@@ -216,8 +240,13 @@ namespace AGENTIK {
 
         private void AddChatNavBarGroup() {
             try {
-                var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = "Онлайн-консультант", ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/Eye.png")), Content = new ChatUsersList{VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch} };
-                navBar.Groups.Add(navBarGroup);
+                var chatUserList = ChatUsersList.Instance;
+                chatUserList.VerticalAlignment = VerticalAlignment.Stretch;
+                chatUserList.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+                var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = "Онлайн-консультант", ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/Eye.png")), Content = chatUserList };
+                if (!navBar.Groups.Contains(navBarGroup))
+                    navBar.Groups.Add(navBarGroup);
             }
             catch (Exception ex) {
                 _log.Error(ex);
@@ -237,7 +266,7 @@ namespace AGENTIK {
                 if (!source.Any())
                     return;
 
-                var growlNotifications = new GrowlNotifiactions();
+                var growlNotifications = new TicketNotifiactions();
                 foreach (Ticket ticket in source) {
                     growlNotifications.AddNotification(ticket);                    
                 }

@@ -58,19 +58,27 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Page Include="ChatUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ChatUsersList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ChatWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="GrowlNotifiactions.xaml">
+    <Page Include="Controls\ChatRichTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ChatUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ChatUsersList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MessageNotifiactions.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TicketNotifiactions.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -285,17 +293,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ChatUserControl.xaml.cs">
-      <DependentUpon>ChatUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ChatUsersList.xaml.cs">
-      <DependentUpon>ChatUsersList.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GrowlNotifiactions.xaml.cs">
-      <DependentUpon>GrowlNotifiactions.xaml</DependentUpon>
+    <Compile Include="Controls\ChatRichTextBox.xaml.cs">
+      <DependentUpon>ChatRichTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ChatUserControl.xaml.cs">
+      <DependentUpon>ChatUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ChatUsersList.xaml.cs">
+      <DependentUpon>ChatUsersList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MessageNotifiactions.xaml.cs">
+      <DependentUpon>MessageNotifiactions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TicketNotifiactions.xaml.cs">
+      <DependentUpon>TicketNotifiactions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Models\Message.cs" />
@@ -422,9 +436,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

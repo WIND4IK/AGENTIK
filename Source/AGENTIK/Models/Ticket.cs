@@ -11,8 +11,6 @@ using AGENTIK.Resources;
 
 namespace AGENTIK.Models
 {
-    public class Notifications : ObservableCollection<Ticket> { }
-
     [Serializable]
     public class ViewTicket
     {

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using AGENTIK.Models;
 using DevExpress.Xpf.Core;
@@ -16,7 +14,7 @@ using jabber.protocol.client;
 using jabber.protocol.iq;
 using log4net;
 
-namespace AGENTIK {
+namespace AGENTIK.Controls {
     /// <summary>
     /// Interaction logic for ChatUsersList.xaml
     /// </summary>
@@ -27,13 +25,31 @@ namespace AGENTIK {
 
         private readonly ObservableCollection<ChatUser> _users;
 
-        private ObservableCollection<ViewChatUser> _chatUserControls;
+        private ObservableCollection<ViewChatUser> _viewChatUsers;
+
+        private Dictionary<string, ViewChatUser> _allViewChatUsers;
+
+        private MessageNotifiactions _notificationsWindow; 
 
         private JID _jid;
 
-        private ChatWindow _chatWindow; 
+        private ChatWindow _chatWindow;
 
-        public ChatUsersList() {
+        private static ChatUsersList _instance;
+
+        public static ChatUsersList Instance {
+            get {
+                if(_instance == null)
+                    _instance = new ChatUsersList();
+                return _instance;
+            }
+        }
+
+        public Dictionary<string, ViewChatUser> ViewChatUsers {
+            get { return _allViewChatUsers; }
+        }
+
+        private ChatUsersList() {
             InitializeComponent();
 
             InitializeJabberClient();
@@ -41,7 +57,8 @@ namespace AGENTIK {
             _users = new ObservableCollection<ChatUser>();
             usersListView.ItemsSource = _users;
 
-            _chatUserControls = new ObservableCollection<ViewChatUser>();
+            _viewChatUsers = new ObservableCollection<ViewChatUser>();
+            _allViewChatUsers = new Dictionary<string, ViewChatUser>();
 
             Unloaded += OnUnloaded;
         }
@@ -124,9 +141,27 @@ namespace AGENTIK {
 
         private void JabberClientOnMessage(object sender, Message msg) {
             try {
-                if (!_users.Select(t => t.Bare).Contains(msg.From.Bare)) {
-                    Application.Current.Dispatcher.Invoke(() => _users.Add(new ChatUser {Bare = msg.From.Bare, Name = msg.From.User}));
-                }
+                ChatUser user;
+                Application.Current.Dispatcher.Invoke(() => {
+                    if (!_users.Select(t => t.Bare).Contains(msg.From.Bare)) {
+                        user = new ChatUser {Bare = msg.From.Bare, Name = msg.From.User};
+                        _users.Add(user);
+                    }
+                    else
+                        user = _users.First(t => t.Bare.Equals(msg.From.Bare));
+
+                    var viewChatUser = GetViewChatUser(user);
+                    if (msg.Body != "") {
+                        string receivedMsg = msg.Body;
+
+                        var message = new ChatMessage(viewChatUser.ChatUser.Name) { Text = receivedMsg, From = msg.From.Bare };
+                        viewChatUser.Messages.Add(message);
+
+                        ShowMessageNotification(message);
+
+                        msg.Body = "";
+                    }
+                });
             }
             catch (Exception ex) {
                 _log.Error(ex);
@@ -182,6 +217,17 @@ namespace AGENTIK {
             }
         }
 
+        private void ShowMessageNotification(ChatMessage message) {
+            try {
+                if (_notificationsWindow == null)
+                    _notificationsWindow = new MessageNotifiactions();
+                _notificationsWindow.AddNotification(message);
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
+        }
+
         private void OnListViewItemDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
                 var listViewItem = (ListViewItem) sender;
@@ -189,23 +235,39 @@ namespace AGENTIK {
                     var chatUser = (ChatUser) listViewItem.Content;
                     if (chatUser != null) {
                         if (_chatWindow == null) {
-                            _chatWindow = new ChatWindow();
-                            _chatWindow.ChatUserControls = _chatUserControls;
+                            _chatWindow = ChatWindow.Instance;
+                            _viewChatUsers = _chatWindow.ViewChatUsers;
                         }
+                        var viewChatUser = GetViewChatUser(chatUser);
 
-                        if (!_chatUserControls.Select(t => t.ChatUser).Contains(chatUser)) {
-                            var viewChatUser = new ViewChatUser();
-                            viewChatUser.JabberClient = _jabberClient;
-                            viewChatUser.ChatUser = chatUser;
-                            _chatUserControls.Insert(0, viewChatUser);
+                        if (!_viewChatUsers.Select(t => t.ChatUser).Contains(chatUser)) {
+                            _viewChatUsers.Insert(0, viewChatUser);
                         }
-                        _chatWindow.SelectedViewChatUser = _chatUserControls.First(t => t.ChatUser == chatUser);
+                        _chatWindow.SelectedViewChatUser = _viewChatUsers.First(t => t.ChatUser.Equals(chatUser));
                         _chatWindow.Show();
                     }
                 }
             }
             catch (Exception ex) {
                 _log.Error(ex);
+            }
+        }
+
+        private ViewChatUser GetViewChatUser(ChatUser chatUser) {
+            try {
+                ViewChatUser viewChatUser;
+                if (!_allViewChatUsers.ContainsKey(chatUser.Bare)) {
+                    viewChatUser = new ViewChatUser { JabberClient = _jabberClient, ChatUser = chatUser, Messages = new ObservableCollection<ChatMessage>() };
+                    _allViewChatUsers.Add(chatUser.Bare, viewChatUser);
+                }
+                else
+                    viewChatUser = _allViewChatUsers[chatUser.Bare];
+
+                return viewChatUser;
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
+                return null;
             }
         }
     }

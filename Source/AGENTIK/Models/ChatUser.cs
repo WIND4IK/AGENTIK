@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -19,11 +20,25 @@ namespace AGENTIK.Models {
         public PresenceType Status { get; set; }
 
         public BitmapImage Image { get { return new BitmapImage(new Uri(Status == PresenceType.available ? "pack://application:,,,/Icons/Inactive.ico" : "pack://application:,,,/Icons/Error.ico")); } }
+
+        public override bool Equals(object obj) {
+            var chatUser = obj as ChatUser;
+            if (chatUser != null) {
+                return Bare.Equals(chatUser.Bare);
+            }
+            return false;
+        }
+
+        public override int GetHashCode() {
+            return Bare.GetHashCode();
+        }
     }
 
     public class ViewChatUser {
         public JabberClient JabberClient { get; set; }
 
         public ChatUser ChatUser { get; set; }
+
+        public ObservableCollection<ChatMessage> Messages { get; set; }
     }
 }
