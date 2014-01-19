@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
+using AGENTIK.Controls;
 using AGENTIK.Resources;
 using DevExpress.Xpf.Core;
 using DevExpress.Xpf.Ribbon;
@@ -104,6 +105,7 @@ namespace AGENTIK {
                 cmbBoxUserName.ItemsSource = _dictionary.Keys.ToList();
             }
             catch (Exception ex) {
+                _log.Error(ex);
                 DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
@@ -135,6 +137,7 @@ namespace AGENTIK {
                 }
             }
             catch (Exception ex) {
+                _log.Error(ex);
                 DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
@@ -169,6 +172,7 @@ namespace AGENTIK {
                 }
             }
             catch (Exception ex) {
+                _log.Error(ex);
                 DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
@@ -212,6 +216,7 @@ namespace AGENTIK {
                     passwordBox.EditValue = _dictionary[cmbBoxUserName.Text];
             }
             catch (Exception ex) {
+                _log.Error(ex);
                 DXMessageBox.Show("Runtime Error:" + ex.Message);
             }
         }
@@ -258,7 +263,7 @@ namespace AGENTIK {
                 }
             }
             catch (Exception ex) {
-                _log.Error(ex.Message);
+                _log.Error(ex);
             }
         }
 
@@ -288,12 +293,12 @@ namespace AGENTIK {
                 settingsWindow.ShowDialog();
 
                 if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
-                    if (settingsWindow.LoginAddress.Length > 0)
-                        _baseAddress = settingsWindow.LoginAddress.TryGetValidUri();
+                    if (AgentikSettingsControl.Instance.LoginAddress.Length > 0)
+                        _baseAddress = AgentikSettingsControl.Instance.LoginAddress.TryGetValidUri();
                 }
             }
             catch (Exception ex) {
-                _log.Error(ex.Message);
+                _log.Error(ex);
             }
         }
 

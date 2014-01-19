@@ -37,6 +37,10 @@ namespace AGENTIK {
         private Uri _logoutUri = new Uri("http://skylogic.mysecretar.com/mys/logout");
         private Uri _dataUri = new Uri("http://skylogic.mysecretar.com/mys/xml");
 
+        private const string AgentikImage = "Icons/NetDrives.ico";
+        private const string MessageImage = "Images/32_32_message.gif";
+        private const string TicketsSound = "Sounds\\sound.mp3";
+
         private static CookieContainer _cookieContainer;
 
         private readonly List<ViewTicket> _treeViewSource;
@@ -45,7 +49,6 @@ namespace AGENTIK {
 
         private bool _isClose;
 
-        private readonly TrayIcon _trayIcon = new TrayIcon();
         private const string POST = "post";
 
         private DispatcherTimer _dispatcherTimer;
@@ -78,8 +81,6 @@ namespace AGENTIK {
         private void LoadData() {
             try {
                 RefreshData();
-                //Add Chat NavBarGroup
-                AddChatNavBarGroup();
 
                 _dispatcherTimer = new DispatcherTimer();
                 _dispatcherTimer.Tick += Callback;
@@ -103,7 +104,7 @@ namespace AGENTIK {
                 }
             }
             catch (HttpRequestException ex) {
-                _log.Error(ex.Message);
+                _log.Error(ex);
             }
         }
 
@@ -133,7 +134,7 @@ namespace AGENTIK {
                 Activate();
             }
 
-            RefreshIcon(0, Visibility.Hidden);
+            RefreshIcon(AgentikImage, 0, Visibility.Hidden);
         }
 
         private void OnExitClick(object sender, RoutedEventArgs e) {
@@ -220,7 +221,7 @@ namespace AGENTIK {
                 ShowNotification();
             }
             catch (Exception ex) {
-                _log.Error(ex.Message);
+                _log.Error(ex);
             }
         }
 
@@ -238,21 +239,6 @@ namespace AGENTIK {
             }
         }
 
-        private void AddChatNavBarGroup() {
-            try {
-                var chatUserList = ChatUsersList.Instance;
-                chatUserList.VerticalAlignment = VerticalAlignment.Stretch;
-                chatUserList.HorizontalAlignment = HorizontalAlignment.Stretch;
-
-                var navBarGroup = new NavBarGroup { DisplaySource = DisplaySource.Content, Header = "Онлайн-консультант", ImageSource = new BitmapImage(new Uri("pack://application:,,,/Images/Eye.png")), Content = chatUserList };
-                if (!navBar.Groups.Contains(navBarGroup))
-                    navBar.Groups.Add(navBarGroup);
-            }
-            catch (Exception ex) {
-                _log.Error(ex);
-            }
-        }
-
         private void MediaElementOnMediaEnded(object sender, RoutedEventArgs routedEventArgs) {
             mediaElement.Source = null;
         }
@@ -261,7 +247,7 @@ namespace AGENTIK {
             try {
                 var source = _tickets.Where(t => t.RowProperty.New).ToList();
 
-                RefreshIcon(source.Count, source.Count == 0 ? Visibility.Hidden : Visibility.Visible);
+                RefreshIcon(AgentikImage, source.Count, source.Count == 0 ? Visibility.Hidden : Visibility.Visible);
 
                 if (!source.Any())
                     return;
@@ -271,22 +257,26 @@ namespace AGENTIK {
                     growlNotifications.AddNotification(ticket);                    
                 }
 
-                var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
-                var path = Path.Combine(directory.FullName, "Sounds\\sound.mp3");
-                mediaElement.MediaEnded += MediaElementOnMediaEnded;
-                mediaElement.Source = new Uri(path);
-                mediaElement.Play();
-
+                PlaySound();
             }
             catch (Exception ex) {
                 _log.Error(ex.Message);
             }
         }
 
-        private void RefreshIcon(int count, Visibility visibility) {
+        private void PlaySound() {
+            var directory = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
+            var path = Path.Combine(directory.FullName, TicketsSound);
+            mediaElement.MediaEnded += MediaElementOnMediaEnded;
+            mediaElement.Source = new Uri(path);
+            mediaElement.Play();
+        }
+
+        private void RefreshIcon(string imagePath, int count, Visibility visibility) {
             try {
-                _trayIcon.ItemCounter = count;
-                _trayIcon.ItemCounterVisibility = visibility;
+                TrayIcon.Instance.Image = Helper.ImageSourceFromPath(imagePath);
+                TrayIcon.Instance.ItemCounter = count;
+                TrayIcon.Instance.ItemCounterVisibility = visibility;
                 var stream = CreateImage();
                 MyNotifyIcon.IconStream = stream;
             }
@@ -303,20 +293,20 @@ namespace AGENTIK {
                     Matrix m = presentationSource.CompositionTarget.TransformToDevice;
                     Point dpi = m.Transform(new Point(96, 96));
 
-                    bool measureValid = _trayIcon.IsMeasureValid;
+                    bool measureValid = TrayIcon.Instance.IsMeasureValid;
 
                     if (!measureValid) {
                         var size = new Size(32, 32);
-                        _trayIcon.Measure(size);
-                        _trayIcon.Arrange(new Rect(size));
+                        TrayIcon.Instance.Measure(size);
+                        TrayIcon.Instance.Arrange(new Rect(size));
                     }
 
-                    var bmp = new RenderTargetBitmap((int)_trayIcon.RenderSize.Width, (int)_trayIcon.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
+                    var bmp = new RenderTargetBitmap((int)TrayIcon.Instance.RenderSize.Width, (int)TrayIcon.Instance.RenderSize.Height, dpi.X, dpi.Y, PixelFormats.Default);
 
                     // this is waiting for dispatcher to perform measure, arrange and render passes
-                    _trayIcon.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+                    TrayIcon.Instance.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
 
-                    bmp.Render(_trayIcon);
+                    bmp.Render(TrayIcon.Instance);
 
                     return Helper.ConvertToBitmap(bmp);
                 }
@@ -360,12 +350,12 @@ namespace AGENTIK {
                 settingsWindow.ShowDialog();
 
                 if (settingsWindow.DialogResult != null && (bool)settingsWindow.DialogResult) {
-                    if (settingsWindow.LoginAddress.Length > 0)
-                        _baseAddress = settingsWindow.LoginAddress.TryGetValidUri();
-                    if (settingsWindow.LogoutAddress.Length > 0)
-                        _logoutUri = settingsWindow.LogoutAddress.TryGetValidUri();
-                    if (settingsWindow.DataAddress.Length > 0)
-                        _dataUri = settingsWindow.DataAddress.TryGetValidUri();
+                    if (AgentikSettingsControl.Instance.LoginAddress.Length > 0)
+                        _baseAddress = AgentikSettingsControl.Instance.LoginAddress.TryGetValidUri();
+                    if (AgentikSettingsControl.Instance.LogoutAddress.Length > 0)
+                        _logoutUri = AgentikSettingsControl.Instance.LogoutAddress.TryGetValidUri();
+                    if (AgentikSettingsControl.Instance.DataAddress.Length > 0)
+                        _dataUri = AgentikSettingsControl.Instance.DataAddress.TryGetValidUri();
                 }
             }
             catch (Exception ex) {

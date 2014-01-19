@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="AGENTIK.Controls.AgentikSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             mc:Ignorable="d" 
+             d:DesignHeight="180" d:DesignWidth="430">
+    <Grid>
+        <dxe:TextEdit x:Name="txtMain"
+                      Height="24"
+                      Margin="135,10,12,0"
+                      VerticalAlignment="Top"
+                      VerticalContentAlignment="Center"
+                      Text="http://skylogic.mysecretar.com/mys"
+                      TextWrapping="Wrap" />
+        <dxe:TextEdit x:Name="txtLogout"
+                      Height="24"
+                      Margin="135,39,12,0"
+                      VerticalAlignment="Top"
+                      VerticalContentAlignment="Center"
+                      Text="http://skylogic.mysecretar.com/mys/logout"
+                      TextWrapping="Wrap" />
+        <dxe:TextEdit x:Name="txtData"
+                      Height="24"
+                      Margin="135,68,12,0"
+                      VerticalAlignment="Top"
+                      VerticalContentAlignment="Center"
+                      Text="http://skylogic.mysecretar.com/mys/xml"
+                      TextWrapping="Wrap" />
+        <Label Width="125"
+               Height="24"
+               Margin="10,10,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Content="Адрес секретаря :" />
+        <Label Width="101"
+               Height="24"
+               Margin="10,39,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               VerticalContentAlignment="Center"
+               Content="Адрес выхода :" />
+        <Label Width="101"
+               Height="24"
+               Margin="10,68,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               VerticalContentAlignment="Center"
+               Content="Информация :" />
+        <dxe:DateEdit x:Name="timePicker"
+                      Height="24"
+                      Margin="0,126,12,0"
+                      VerticalAlignment="Top"
+                      AllowDefaultButton="False"
+                      AllowNullInput="False"
+                      DateEditPopupContentType="DateTimePicker"
+                      DisplayFormatString="HH:mm:ss"
+                      Mask="HH:mm:ss"
+                      MaskCulture="ru-RU"
+                      MaskType="DateTime"
+                      MaskUseAsDisplayFormat="True"
+                      ShowClearButton="False"
+                      ShowEditorButtons="False" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="65" />
+        <dxe:CheckEdit x:Name="chbStart"
+                       Height="21"
+                       Margin="10,151,12,0"
+                       VerticalAlignment="Top"
+                       Content="Запускать при старте Windows" />
+        <Label Width="150"
+               Height="24"
+               Margin="10,122,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               VerticalContentAlignment="Center"
+               Content="Период обновления :" />
+        <Label Width="101"
+               Height="24"
+               Margin="10,97,0,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               VerticalContentAlignment="Center"
+               Content="Тема :" />
+        <dxg:LookUpEdit x:Name="leTheme"
+                        Height="24"
+                        Margin="135,97,12,0"
+                        VerticalAlignment="Top"
+                        AutoComplete="True"
+                        AutoPopulateColumns="False"
+                        DisplayMember="Name"
+                        ImmediatePopup="True"
+                        IncrementalFiltering="True"
+                        IsPopupAutoWidth="False"
+                        ValueMember="Name">
+            <dxg:LookUpEdit.PopupContentTemplate>
+                <ControlTemplate>
+                    <dxg:GridControl Name="PART_GridControl">
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn FieldName="Name" />
+                        </dxg:GridControl.Columns>
+                        <dxg:GridControl.View>
+                            <dxg:TableView AutoWidth="True" />
+                        </dxg:GridControl.View>
+                    </dxg:GridControl>
+                </ControlTemplate>
+            </dxg:LookUpEdit.PopupContentTemplate>
+        </dxg:LookUpEdit>
+    </Grid>
+</UserControl>

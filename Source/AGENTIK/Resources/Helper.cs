@@ -56,25 +56,13 @@ namespace AGENTIK.Resources {
             return child;
         }
 
-        public static string SerializeObject(object obj) {
-            var xmlSerializer = new XmlSerializer(obj.GetType());
-            var writer = new StringWriter();
+        public static ImageSource ImageSourceFromPath(string path) {
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.UriSource = new Uri("pack://application:,,,/AGENTIK;component/" + path);
+            bitmapImage.EndInit();
 
-            xmlSerializer.Serialize(writer, obj);
-            return writer.ToString();
-        }
-
-        public static Object DeSerializeObject(string xmlOfObject, Type objectType) {
-            var strReader = new StringReader(xmlOfObject);
-            var xmlSerializer = new XmlSerializer(objectType);
-            var xmlReader = new XmlTextReader(strReader);
-            try {
-                return xmlSerializer.Deserialize(xmlReader);
-            }
-            finally {
-                xmlReader.Close();
-                strReader.Close();
-            }
+            return bitmapImage;
         }
 
     }

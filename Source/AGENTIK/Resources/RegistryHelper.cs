@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace AGENTIK.Resources {
     public static class RegistryHelper {
-        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public const string ApplicationKeyName = "Software\\AGENTIK";
         private const string LoginKey = "LoginUri";
@@ -23,6 +23,7 @@ namespace AGENTIK.Resources {
         }
 
         public static string LoginAddress { get; set; }
+        
         public static DateTime RefreshTime { get; set; }
 
         public static string DataAddress { get; set; }
@@ -40,7 +41,7 @@ namespace AGENTIK.Resources {
         private static bool IsInStartUp() {
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false);
             if (registryKey == null) {
-                Log.Error("Registry key is null");
+                _log.Error("Registry key is null");
                 return false;
             }
 
@@ -50,7 +51,7 @@ namespace AGENTIK.Resources {
             try {
                 RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
                 if (registryKey == null) {
-                    Log.Error("Registry key is null");
+                    _log.Error("Registry key is null");
                     return;
                 }
 
@@ -66,7 +67,7 @@ namespace AGENTIK.Resources {
 
             }
             catch (Exception ex) {
-                Log.Error(ex.Message);
+                _log.Error(ex.Message);
                 MessageBox.Show("Ошибка!", "Внимание", MessageBoxButton.OK);
             }
         }
@@ -89,7 +90,7 @@ namespace AGENTIK.Resources {
                     RefreshTime = DateTime.Parse(_registryKey.GetValue(RefreshTimeKey).ToString());
             }
             catch (Exception ex) {
-                Log.Error(ex.Message);
+                _log.Error(ex);
                 MessageBox.Show("Ошибка при загрузке данных из реестра", "Внимание", MessageBoxButton.OK);
             }
         }
@@ -110,7 +111,7 @@ namespace AGENTIK.Resources {
                 RegisterInStartup(IsStartUp);
             }
             catch (Exception ex) {
-                Log.Error(ex.Message);
+                _log.Error(ex);
                 MessageBox.Show("Ошибка при сохранении настроек", "Внимание", MessageBoxButton.OK);
             }
         }

@@ -33,7 +33,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media.Imaging;
 using AGENTIK.TaskbarNotification.Interop;
+using Image = System.Windows.Controls.Image;
 
 namespace AGENTIK.TaskbarNotification
 {

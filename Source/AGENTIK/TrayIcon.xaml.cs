@@ -38,9 +38,22 @@ namespace AGENTIK
             set { SetValue(ItemCounterVisibilityProperty, value); }
         }
 
-        public TrayIcon()
+        public static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof (ImageSource), typeof (TrayIcon), new PropertyMetadata(default(ImageSource)));
+
+        public ImageSource Image {
+            get { return (ImageSource) GetValue(ImageProperty); }
+            set { SetValue(ImageProperty, value); }
+        }
+
+        private static TrayIcon _instance;
+
+        public static TrayIcon Instance {
+            get { return _instance ?? (_instance = new TrayIcon()); }
+        }
+        private TrayIcon()
         {
             InitializeComponent();
+
         }
     }
 }

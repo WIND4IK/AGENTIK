@@ -155,7 +155,7 @@ namespace AGENTIK.TaskbarNotification
 
     #endregion
 
-    #region ImageSource to Icon
+    #region ImageSource to _image
 
     /// <summary>
     /// Reads a given image resource into a WinForms icon.

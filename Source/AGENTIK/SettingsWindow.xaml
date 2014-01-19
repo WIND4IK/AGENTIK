@@ -5,139 +5,34 @@
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid.LookUp;assembly=DevExpress.Xpf.Grid.v13.1"
                     xmlns:dxr="clr-namespace:DevExpress.Xpf.Ribbon;assembly=DevExpress.Xpf.Ribbon.v13.1"
-                    xmlns:grid="clr-namespace:DevExpress.Xpf.Grid;assembly=DevExpress.Xpf.Grid.v13.1"
+                    xmlns:controls="clr-namespace:AGENTIK.Controls"
                     Title="Настройки"
-                    Width="457"
-                    Height="260"
+                    Width="620"
+                    Height="300"
                     FontFamily="Verdana"
                     ResizeMode="NoResize"
                     ShowInTaskbar="False"
-                    WindowStartupLocation="CenterOwner"
+                    WindowStartupLocation="CenterScreen"
                     WindowStyle="ToolWindow">
     <Grid>
-        <dxe:TextEdit x:Name="txtMain"
-                      Width="283"
-                      Height="24"
-                      Margin="135,10,0,0"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      VerticalContentAlignment="Center"
-                      Text="http://skylogic.mysecretar.com/mys"
-                      TextWrapping="Wrap" />
-        <dxe:TextEdit x:Name="txtLogout"
-                      Width="283"
-                      Height="24"
-                      Margin="135,39,0,0"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      VerticalContentAlignment="Center"
-                      Text="http://skylogic.mysecretar.com/mys/logout"
-                      TextWrapping="Wrap" />
-        <dxe:TextEdit x:Name="txtData"
-                      Width="283"
-                      Height="24"
-                      Margin="135,68,0,0"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      VerticalContentAlignment="Center"
-                      Text="http://skylogic.mysecretar.com/mys/xml"
-                      TextWrapping="Wrap" />
-        <Label Width="125"
-               Height="24"
-               Margin="10,10,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               Content="Адрес секретаря :" />
-        <Label Width="101"
-               Height="24"
-               Margin="10,39,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               VerticalContentAlignment="Center"
-               Content="Адрес выхода :" />
-        <Label Width="101"
-               Height="24"
-               Margin="10,68,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               VerticalContentAlignment="Center"
-               Content="Информация :" />
-        <dxe:DateEdit x:Name="timePicker"
-                      Width="100"
-                      Height="24"
-                      Margin="318,126,0,0"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Top"
-                      AllowDefaultButton="False"
-                      AllowNullInput="False"
-                      DateEditPopupContentType="DateTimePicker"
-                      DisplayFormatString="HH:mm:ss"
-                      Mask="HH:mm:ss"
-                      MaskCulture="ru-RU"
-                      MaskType="DateTime"
-                      MaskUseAsDisplayFormat="True"
-                      ShowClearButton="False"
-                      ShowEditorButtons="False" />
-        <dxe:CheckEdit x:Name="chbStart"
-                       Width="249"
-                       Height="21"
-                       Margin="10,151,0,0"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Content="Запускать при старте Windows" />
-        <Button Width="100"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <controls:SettingsUserControl x:Name="settingsUserControl" Grid.Row="0"/>
+        <Button Grid.Row="1"
+                Width="100"
                 Height="24"
-                Margin="318,177,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+                Margin="0,0,15,10"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
                 Click="OnSaveButtonClick"
                 Content="Сохранить" />
-        <Button Width="100"
-                Height="24"
-                Margin="200,177,0,0"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+        <Button Grid.Row="1"
+                Width="100"
+                Margin="0,0,135,10"
+                HorizontalAlignment="Right"
                 Click="OnCancelButtonClick"
-                Content="Отмена" />
-        <Label Width="150"
-               Height="24"
-               Margin="10,122,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               VerticalContentAlignment="Center"
-               Content="Период обновления :" />
-        <Label Width="101"
-               Height="24"
-               Margin="10,97,0,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               VerticalContentAlignment="Center"
-               Content="Тема :" />
-        <dxg:LookUpEdit x:Name="leTheme"
-                        Width="283"
-                        Height="24"
-                        Margin="135,97,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        AutoComplete="True"
-                        AutoPopulateColumns="False"
-                        DisplayMember="Name"
-                        ImmediatePopup="True"
-                        IncrementalFiltering="True"
-                        IsPopupAutoWidth="False"
-                        ValueMember="Name">
-            <dxg:LookUpEdit.PopupContentTemplate>
-                <ControlTemplate>
-                    <grid:GridControl Name="PART_GridControl">
-                        <grid:GridControl.Columns>
-                            <grid:GridColumn FieldName="Name" />
-                        </grid:GridControl.Columns>
-                        <grid:GridControl.View>
-                            <grid:TableView AutoWidth="True" />
-                        </grid:GridControl.View>
-                    </grid:GridControl>
-                </ControlTemplate>
-            </dxg:LookUpEdit.PopupContentTemplate>
-        </dxg:LookUpEdit>
+                Content="Отмена" Height="24" VerticalAlignment="Bottom" />
     </Grid>
 </dxr:DXRibbonWindow>

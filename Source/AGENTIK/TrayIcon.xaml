@@ -3,12 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:gif="http://wpfanimatedgif.codeplex.com"
              x:Name="trayIcon"
              d:DesignHeight="32"
              d:DesignWidth="32"
              mc:Ignorable="d">
     <UserControl.Background>
-        <ImageBrush ImageSource="Icons/NetDrives.ico" />
+        <ImageBrush  ImageSource="{Binding Image, ElementName=trayIcon}" />
     </UserControl.Background>
     <Grid Width="24"
           Height="24"
@@ -16,6 +17,7 @@
           VerticalAlignment="Bottom"
           Visibility="{Binding ItemCounterVisibility,
                                ElementName=trayIcon}">
+        <Image gif:ImageBehavior.AnimatedSource="/Images/32_32_message.gif"/>
         <Ellipse Fill="#FFF95353"
                  Stroke="White"
                  StrokeThickness="2" />

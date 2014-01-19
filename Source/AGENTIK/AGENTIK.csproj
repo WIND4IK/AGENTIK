@@ -58,25 +58,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Page Include="ChatWindow.xaml">
+    <Page Include="Controls\AgentikSettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\ChatRichTextBox.xaml">
+    <Page Include="Controls\SettingsUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\ChatUserControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\ChatUsersList.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="MessageNotifiactions.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="TicketNotifiactions.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -101,6 +89,10 @@
     <DesignData Include="TreeViewSampleData.xaml">
       <SubType>Designer</SubType>
     </DesignData>
+    <Reference Include="AGENTIK.TaskbarNotification, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\libs\AGENTIK.TaskbarNotification.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Data.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -117,7 +109,9 @@
       <HintPath>C:\Program Files (x86)\DevExpress\DXperience 13.1\Bin\Framework\DevExpress.Xpf.Core.v13.1.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Docking.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Xpf.Docking.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="devexpress.xpf.grid.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -127,6 +121,7 @@
     <Reference Include="DevExpress.Xpf.Layout.v13.1.Core, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\DevExpress\DXperience 13.1\Bin\Framework\DevExpress.Xpf.Layout.v13.1.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.Xpf.NavBar.v13.1, Version=13.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -257,7 +252,9 @@
     <Reference Include="System.Xaml">
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.XML" />
+    <Reference Include="System.XML">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
       <Private>True</Private>
@@ -274,11 +271,12 @@
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
       <Private>True</Private>
     </Reference>
+    <Reference Include="WpfAnimatedGif">
+      <HintPath>..\libs\WpfAnimatedGif.dll</HintPath>
+    </Reference>
     <Reference Include="zlib.net">
       <HintPath>..\libs\zlib.net.dll</HintPath>
     </Reference>
-    <Resource Include="Icons\Inactive.ico" />
-    <Resource Include="Icons\Error.ico" />
     <Resource Include="Images\Info.png" />
     <Resource Include="Images\Preferences.png" />
     <Page Include="LoginWindow.xaml">
@@ -293,26 +291,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ChatWindow.xaml.cs">
-      <DependentUpon>ChatWindow.xaml</DependentUpon>
+    <Compile Include="Controls\AgentikSettingsControl.xaml.cs">
+      <DependentUpon>AgentikSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ChatRichTextBox.xaml.cs">
-      <DependentUpon>ChatRichTextBox.xaml</DependentUpon>
+    <Compile Include="Controls\SettingsUserControl.xaml.cs">
+      <DependentUpon>SettingsUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ChatUserControl.xaml.cs">
-      <DependentUpon>ChatUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ChatUsersList.xaml.cs">
-      <DependentUpon>ChatUsersList.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MessageNotifiactions.xaml.cs">
-      <DependentUpon>MessageNotifiactions.xaml</DependentUpon>
+    <Compile Include="Interfaces\ISettings.cs" />
+    <Compile Include="Models\SettingItem.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="TicketNotifiactions.xaml.cs">
       <DependentUpon>TicketNotifiactions.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\ChatUser.cs" />
-    <Compile Include="Models\Message.cs" />
     <Compile Include="Models\Ticket.cs" />
     <Compile Include="Resources\Extensions.cs" />
     <Compile Include="Resources\Helper.cs" />
@@ -343,11 +337,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -358,38 +347,31 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
-    <Resource Include="Icons\mainicon.ico" />
+    <Resource Include="Images\Bulb.ico" />
+    <Resource Include="Images\Computers.ico" />
+    <Resource Include="Images\Error.ico" />
+    <Resource Include="Images\Inactive.ico" />
+    <Resource Include="Images\mainicon.ico" />
+    <Resource Include="Images\NetDrives.ico" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NotifyIconWpf\NotifyIconWpf.csproj">
-      <Project>{7AC63864-7638-41C4-969C-D3197EF2BED9}</Project>
-      <Name>NotifyIconWpf</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Updater\Updater.csproj">
       <Project>{46fb8134-0aae-4e81-9b95-65dc9fdaa330}</Project>
       <Name>Updater</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\NetDrives.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Bulb.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Computers.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Add.png" />
