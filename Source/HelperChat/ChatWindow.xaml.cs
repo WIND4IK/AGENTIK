@@ -16,16 +16,10 @@ namespace HelperChat {
     public partial class ChatWindow : DXWindow {
         private readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private bool _isClose;
-
         private static ChatWindow _instance;
 
         public static ChatWindow Instance {
-            get {
-                if (_instance == null)
-                    _instance = new ChatWindow();
-                return _instance;
-            }
+            get { return _instance ?? (_instance = new ChatWindow()); }
         }
 
         public ObservableCollection<ViewChatUser> ViewChatUsers {
@@ -81,16 +75,8 @@ namespace HelperChat {
             InitializeComponent();
 
             ViewChatUsers = new ObservableCollection<ViewChatUser>();
-            
-            Closing += OnClosing;
         }
 
-        private void OnClosing(object sender, CancelEventArgs e) {
-            if (!_isClose) {
-                Hide();
-                e.Cancel = true;
-            }
-        }
 
         private void OnDockManagerDockItemClosing(object sender, DevExpress.Xpf.Docking.Base.ItemCancelEventArgs e) {
             try {
@@ -108,11 +94,6 @@ namespace HelperChat {
             catch (Exception ex) {
                 _log.Error(ex);
             }
-        }
-
-        public void Dispose() {
-            _isClose = true;
-            Close();
         }
     }
 }

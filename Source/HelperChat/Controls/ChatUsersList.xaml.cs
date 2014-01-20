@@ -29,8 +29,6 @@ namespace HelperChat.Controls {
 
         private readonly ObservableCollection<ChatUser> _users;
 
-        private readonly ObservableCollection<ChatUser> _archiveUsers;
-
         private readonly ObservableCollection<ChatUser> _filterUsers;
 
         private ObservableCollection<ViewChatUser> _viewChatUsers;
@@ -50,11 +48,7 @@ namespace HelperChat.Controls {
         private static ChatUsersList _instance;
 
         public static ChatUsersList Instance {
-            get {
-                if(_instance == null)
-                    _instance = new ChatUsersList();
-                return _instance;
-            }
+            get { return _instance ?? (_instance = new ChatUsersList()); }
         }
 
         public Dictionary<string, ViewChatUser> ViewChatUsers {
@@ -79,7 +73,6 @@ namespace HelperChat.Controls {
             InitializeJabberClient();
 
             _users = new ObservableCollection<ChatUser>();
-            _archiveUsers = new ObservableCollection<ChatUser>();
             _filterUsers = new ObservableCollection<ChatUser>();
             usersListView.ItemsSource = _filterUsers;
 
@@ -90,6 +83,7 @@ namespace HelperChat.Controls {
             Unloaded += OnUnloaded;
         }
 
+        
         void OnChatUsersListLoaded(object sender, RoutedEventArgs e) {
             try {
                 _dispatcherTimer = new DispatcherTimer();
@@ -107,6 +101,8 @@ namespace HelperChat.Controls {
 
         private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs) {
             try {
+                if(_chatWindow != null)
+                    _chatWindow.Close();
                 //if(_jabberClient != null)
                 //    _jabberClient.Close(true);
             }
@@ -193,24 +189,14 @@ namespace HelperChat.Controls {
         private void JabberClientOnMessage(object sender, Message msg) {
             try {
                 Application.Current.Dispatcher.Invoke(() => {
+                    ChatUser user;
                     if (!_users.Select(t => t.Bare).Contains(msg.From.Bare)) {
-                        var user = new ChatUser {Bare = msg.From.Bare, Name = msg.From.User};
+                        user = new ChatUser {Bare = msg.From.Bare, Name = msg.From.User};
                         _users.Add(user);
                     }
-                    //else
-                    //    user = _users.First(t => t.Bare.Equals(msg.From.Bare));
-
-                    //var viewChatUser = GetViewChatUser(user);
-                    //if (msg.Body != "") {
-                    //    string receivedMsg = msg.Body;
-
-                    //    var message = new ChatMessage(viewChatUser.ChatUser.Name) { Text = receivedMsg, From = msg.From.Bare };
-                    //    viewChatUser.Messages.Add(message);
-
-                    //    ShowMessageNotification(message);
-
-                    //    msg.Body = "";
-                    //}
+                    else
+                        user = _users.First(t => t.Bare.Equals(msg.From.Bare));
+                    ShowMessageNotification(new ChatMessage(user.Name) { Text = msg.Body, From = user.Bare });
                 });
             }
             catch (Exception ex) {
@@ -237,7 +223,8 @@ namespace HelperChat.Controls {
                 if (ri.JID.Bare != _jid.Bare && !_users.Select(t => t.Bare).Contains(ri.JID.Bare)) {
                     Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                         (Action) (() => {
-                            _users.Add(new ChatUser {Bare = ri.JID.Bare, Name = ri.JID.User});
+                            var userName = GetUserName(ri.JID.Bare);
+                            _users.Add(new ChatUser {Bare = ri.JID.Bare, Name = userName ?? ri.JID.User});
                             FilterText = String.Empty;
                         }));
                 }
@@ -245,6 +232,30 @@ namespace HelperChat.Controls {
             catch (Exception ex) {
                 _log.Error(ex);
             }
+        }
+
+        private string GetUserName(string bare) {
+            try {
+                var currentPath = Directory.GetCurrentDirectory();
+                var directory = Path.Combine(currentPath, "History");
+
+                if (!Directory.Exists(directory))
+                    return null;
+
+                var path = Path.Combine(directory, String.Format("{0}.csv", bare));
+                if (!File.Exists(path))
+                    return null;
+
+                using (var reader = new StreamReader(File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))) {
+                    while (!reader.EndOfStream) {
+                        return reader.ReadLine();
+                    }
+                }
+            }
+            catch (Exception ex) {
+                _log.Error(ex);
+            }
+            return null;
         }
 
         void RosterManagerOnRosterBegin(object sender) {
@@ -264,7 +275,8 @@ namespace HelperChat.Controls {
         void JabberClientOnAuthenticate(object sender) {
             try {
                 Application.Current.Dispatcher.Invoke(() => {
-                    _dispatcherTimer.Stop();
+                    if(_dispatcherTimer != null)
+                        _dispatcherTimer.Stop();
                     JabberClient.Presence(PresenceType.available, PresenceType.available.ToString(), "", 1);
                 });
             }
@@ -345,6 +357,26 @@ namespace HelperChat.Controls {
                 tb.Text = ((TextBox)sender).Text;
                 tb.Visibility = Visibility.Visible;
                 ((TextBox)sender).Visibility = Visibility.Collapsed;
+
+                var user = usersListView.SelectedItem as ChatUser;
+                if (user == null) {
+                    _log.ErrorFormat("Unable to determine user!");
+                    return;
+                }
+                var currentPath = Directory.GetCurrentDirectory();
+                var directory = Path.Combine(currentPath, "History");
+
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                var path = Path.Combine(directory, String.Format("{0}.csv", user.Bare));
+                if (!File.Exists(path))
+                    File.AppendAllLines(path, new[]{tb.Text});
+                else {
+                    var lines = File.ReadAllLines(path);
+                    lines[0] = tb.Text;
+                    File.WriteAllLines(path, lines.ToArray());
+                }
             }
             catch (Exception ex) {
                 _log.Error(ex);
@@ -359,6 +391,11 @@ namespace HelperChat.Controls {
             catch (Exception ex) {
                 _log.Error(ex);
             }
+        }
+
+        private void OnUserNameTextBoxKeyDown(object sender, KeyEventArgs e) {
+            if(e.Key == Key.Enter)
+                usersListView.Focus();
         }
     }
 }
