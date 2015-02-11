@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
+using System.Windows.Navigation;
 
 namespace AGENTIK.Resources
 {
@@ -17,7 +18,7 @@ namespace AGENTIK.Resources
         }
 
 
-        void AssociatedObject_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        void AssociatedObject_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;

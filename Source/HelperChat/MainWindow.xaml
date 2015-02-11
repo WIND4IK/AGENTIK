@@ -1,0 +1,122 @@
+﻿<dx:DXWindow x:Class="HelperChat.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        xmlns:taskbarNotification="clr-namespace:AGENTIK.TaskbarNotification;assembly=AGENTIK.TaskbarNotification"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        Title="MainWindow" Height="515" Width="430" Name="dXWindow">
+    <dx:DXWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter1" />
+        <DataTemplate x:Key="ListItemTemplate" >
+            <Grid Background="#00FFFFFF">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Width="17" Margin="0,0,5,0" gif:ImageBehavior.AnimatedSource="{Binding Image,UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Grid.Column="1" FontSize="14" FontFamily="Verdana" Text="{Binding Name}" />
+                <TextBox Grid.Column="1" FontSize="14" FontFamily="Verdana" Visibility="Collapsed" Text="{Binding Name}" KeyDown="OnUserNameTextBoxKeyDown" GotFocus="OnUserNameTextBoxGotFocus" LostFocus="OnUserNameTextBoxLostFocus" />
+                <Button Grid.Column="2" Content="Переименовать" Style="{StaticResource TransparentButton}" FontFamily="Verdana" FontSize="10" VerticalAlignment="Center" Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}},Path=IsSelected,Converter={StaticResource BooleanToVisibilityConverter1}}" Click="OnRenameButtonClick" />
+            </Grid>
+        </DataTemplate>
+    </dx:DXWindow.Resources>
+    <Grid Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26" />
+            <RowDefinition Height="26" />
+            <RowDefinition Height="410*" />
+        </Grid.RowDefinitions>
+        <taskbarNotification:TaskbarIcon Name="notifyIcon" ToolTipText="Online-Консультант" TrayMouseDoubleClick="OnNotifyIconMouseDoubleClick" >
+            <FrameworkElement.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Выход" Click="OnExitClick" />
+                </ContextMenu>
+            </FrameworkElement.ContextMenu>
+        </taskbarNotification:TaskbarIcon>
+        <Border Grid.Row="1" BorderThickness="1" BorderBrush="#FFB0CFF7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <dxe:TextEdit Name="searchTextBox" Grid.Column="0" VerticalContentAlignment="Center" FontFamily="Verdana" Margin="2" NullText="Поиск" UseLayoutRounding="True" KeyUp="OnSearchTextBoxKeyUp" />
+            </Grid>
+        </Border>
+        <Border Grid.Row="0" BorderThickness="1" BorderBrush="#FFB0CFF7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0">
+                    <Border.Style>
+                        <Style>
+                            <Setter Property="Border.Background" Value="#00FFFFFF" />
+                            <Style.Triggers>
+                                <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                    <Setter Property="Border.Background" Value="#7FA7A7E0" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Button Name="btnStatus" Style="{StaticResource TransparentButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Margin="2" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Click="OnBtnStatusClick">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding SelectedItem.Image,ElementName=statusListView}" />
+                            <Path Name="CollapsedArrow" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M0,0L4,4 8,0z" Fill="#FFAFAFAF" />
+                        </StackPanel>
+                    </Button>
+                </Border>
+                <Popup Name="popup" Grid.Column="0" Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade" StaysOpen="False" PlacementTarget="{Binding ElementName=btnStatus,Mode=OneWay}">
+                    <ListView Name="statusListView" >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Height="20" >
+                                    <Image Source="{Binding Image}" />
+                                    <TextBlock VerticalAlignment="Center" FontFamily="Verdana" Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}" >
+                                <EventSetter Event="MouseUp" Handler="OnListViewSelectedItemClick" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ListView>
+                </Popup>
+                <TextBlock Name="userTextBlock" Grid.Column="1" Margin="10,2,2,2" FontFamily="Verdana" FontSize="14" VerticalAlignment="Center" UseLayoutRounding="True" SnapsToDevicePixels="True" Text="{Binding CurrentUser,ElementName=dXWindow,NotifyOnSourceUpdated=True}" />
+                <Border Grid.Column="2" Margin="2,0,12,0">
+                    <Border.Style>
+                        <Style>
+                            <Setter Property="Border.Background" Setter.Value="#00FFFFFF" />
+                            <Style.Triggers>
+                                <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                    <Setter Property="Border.Background" Value="#7FA7A7E0" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Button Name="btnSettings" Margin="2" Style="{StaticResource TransparentButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Click="OnSettingsButtonClick">
+                        <Image Source="Images/Settings.png" />
+                    </Button>
+                </Border>
+            </Grid>
+        </Border>
+        <dx:DXTabControl Name="tabControl" Grid.Row="2" FontFamily="Verdana" FontSize="14" Padding="5" UseLayoutRounding="True" SnapsToDevicePixels="True" SelectionChanged="OnDXTabControlSelectionChanged">
+            <dx:DXTabControl.View>
+                <dx:TabControlScrollView HeaderAutoFill="True" />
+            </dx:DXTabControl.View>
+            <dx:DXTabItem Name="currentChatTab" Header="Текущие чаты" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Arial">
+                <ListView Name="usersListView" ItemTemplate="{StaticResource ListItemTemplate}" Background="#00FFFFFF" HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" MouseDoubleClick="OnListViewItemDoubleClick" >
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" />
+                    </ItemsControl.ItemContainerStyle>
+                </ListView>
+            </dx:DXTabItem>
+            <dx:DXTabItem Name="archiveTab" Header="Архив" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        </dx:DXTabControl>
+        <MediaElement Name="mediaElement" HorizontalAlignment="Left" Height="100" Margin="0" Grid.Row="0" VerticalAlignment="Top" Width="100" Visibility="Hidden" LoadedBehavior="Manual" />
+    </Grid>
+
+</dx:DXWindow>

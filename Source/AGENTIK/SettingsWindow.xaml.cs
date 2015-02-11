@@ -17,11 +17,11 @@ namespace AGENTIK {
 
         private void OnSaveButtonClick(object sender, RoutedEventArgs e) {
             DialogResult = true;
-            foreach (var settingItem in settingsUserControl.ItemsSource) {
-                var settings = settingItem.Control as ISettings;
-                if (settings != null)
-                    settings.Save();
-            }
+            //foreach (var settingItem in settingsUserControl.ItemsSource) {
+            //    var settings = settingItem.Control as ISettings;
+            //    if (settings != null)
+            //        settings.Save();
+            //}
             Close();
         }
 

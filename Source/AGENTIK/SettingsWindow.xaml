@@ -1,10 +1,10 @@
 ﻿<dxr:DXRibbonWindow x:Class="AGENTIK.SettingsWindow"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:dx="clr-namespace:DevExpress.Xpf.Core;assembly=DevExpress.Xpf.Core.v13.1"
+                    xmlns:dx="clr-namespace:DevExpress.Xpf.Core;assembly=DevExpress.Xpf.Core.v14.1"
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                    xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid.LookUp;assembly=DevExpress.Xpf.Grid.v13.1"
-                    xmlns:dxr="clr-namespace:DevExpress.Xpf.Ribbon;assembly=DevExpress.Xpf.Ribbon.v13.1"
+                    xmlns:dxg="clr-namespace:DevExpress.Xpf.Grid.LookUp;assembly=DevExpress.Xpf.Grid.v14.1"
+                    xmlns:dxr="clr-namespace:DevExpress.Xpf.Ribbon;assembly=DevExpress.Xpf.Ribbon.v14.1"
                     xmlns:controls="clr-namespace:AGENTIK.Controls"
                     Title="Настройки"
                     Width="620"
@@ -16,10 +16,10 @@
                     WindowStyle="ToolWindow">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
-        <controls:SettingsUserControl x:Name="settingsUserControl" Grid.Row="0"/>
+        <!--<controls:SettingsUserControl x:Name="settingsUserControl" Grid.Row="0" />-->
         <Button Grid.Row="1"
                 Width="100"
                 Height="24"
@@ -33,6 +33,8 @@
                 Margin="0,0,135,10"
                 HorizontalAlignment="Right"
                 Click="OnCancelButtonClick"
-                Content="Отмена" Height="24" VerticalAlignment="Bottom" />
+                Content="Отмена" Height="24"
+                VerticalAlignment="Bottom"
+                />
     </Grid>
 </dxr:DXRibbonWindow>

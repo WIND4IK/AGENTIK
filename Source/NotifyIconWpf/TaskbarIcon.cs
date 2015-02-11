@@ -33,6 +33,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using AGENTIK.TaskbarNotification.Interop;
+using Brushes = System.Windows.Media.Brushes;
 using Point = AGENTIK.TaskbarNotification.Interop.Point;
 
 namespace AGENTIK.TaskbarNotification {
@@ -467,7 +468,7 @@ namespace AGENTIK.TaskbarNotification {
                 //make sure the tooltip is invisible
                 tt.HasDropShadow = false;
                 tt.BorderThickness = new Thickness(0);
-                tt.Background = System.Windows.Media.Brushes.Transparent;
+                tt.Background = Brushes.Transparent;
 
                 //setting the 
                 tt.StaysOpen = true;

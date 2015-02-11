@@ -37,21 +37,21 @@
                              VerticalContentAlignment="Center"
                              GotFocus="OnPasswordBoxGotFocus"
                              MaxLength="256"
-                             KeyUp="OnPasswordBoxKeyUp" ShowCapsLockWarningToolTip="True"/>
+                             KeyUp="OnPasswordBoxKeyUp" ShowCapsLockWarningToolTip="True" />
         <Button Grid.Row="0" Grid.Column="2"
                             Background="{x:Null}"
                             BorderBrush="{x:Null}"
                             BorderThickness="0"
                             Click="OnSettingsButtonClick"
                             Padding="0">
-            <Image Source="pack://application:,,,/DevExpress.Images.v13.1;component/Images/Setup/Properties_32x32.png" />
+            <Image Source="pack://application:,,,/DevExpress.Images.v14.1;component/Images/Setup/Properties_32x32.png" />
         </Button>
 
         <Button x:Name="btnLogin"
                 Grid.Row="6"
                 Grid.Column="1"
                 Content="Войти" 
-                Click="OnLoginButtonClick" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                Click="OnLoginButtonClick" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
 
         <Label Grid.Row="1"
                Grid.Column="1"

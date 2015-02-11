@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -108,7 +109,7 @@ namespace AGENTIK {
             }
         }
 
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e) {
+        protected override void OnClosing(CancelEventArgs e) {
             if (_isClose) {
                 //clean up notifyicon (would otherwise stay open until application finishes)
                 MyNotifyIcon.Dispose();

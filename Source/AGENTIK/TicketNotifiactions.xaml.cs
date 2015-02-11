@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using AGENTIK.Models;
 
 namespace AGENTIK
@@ -67,7 +68,7 @@ namespace AGENTIK
             RemoveNotification(TicketNotifications.First(n => n.RowProperty.Number == Int32.Parse(element.Tag.ToString())));
         }
 
-        private void NotificationWindowMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+        private void NotificationWindowMouseUp(object sender, MouseButtonEventArgs e) {
             var element = sender as Grid;
             var ticket = TicketNotifications.First(t => t.RowProperty.Number == Int32.Parse(element.Tag.ToString()));
             Process.Start(ticket.RowType.Uri.AbsoluteUri);

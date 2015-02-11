@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Web;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 using AGENTIK.Resources;
 
@@ -44,7 +45,7 @@ namespace AGENTIK.Models
         public List<ViewTicket> Children { get; set; }
 
         public object Clone() {
-            return this.MemberwiseClone();
+            return MemberwiseClone();
         }
         public ViewTicket DeepClone() {
             using (var ms = new MemoryStream()) {
@@ -75,8 +76,8 @@ namespace AGENTIK.Models
 
         public static bool operator ==(Ticket left, Ticket right)
         {
-            if (object.ReferenceEquals(left, null))
-                return object.ReferenceEquals(right, null);
+            if (ReferenceEquals(left, null))
+                return ReferenceEquals(right, null);
             else
                 return left.Equals(right);
         }
@@ -111,13 +112,13 @@ namespace AGENTIK.Models
 
         public bool Equals(Ticket other)
         {
-            if (object.ReferenceEquals(other, null))
+            if (ReferenceEquals(other, null))
                 return false;
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
                 return true;
-            if (this.GetType() != other.GetType())
+            if (GetType() != other.GetType())
                 return false;
-            return this.RowProperty != null && other.RowProperty != null && this.RowProperty.Number == other.RowProperty.Number;
+            return RowProperty != null && other.RowProperty != null && RowProperty.Number == other.RowProperty.Number;
         }
 
         #region IXmlSerializable
@@ -132,7 +133,7 @@ namespace AGENTIK.Models
         private static readonly XmlSerializer RowPropertySerializer = new XmlSerializer(typeof(RowProperty));
         private static readonly XmlSerializer ButtonSerializer = new XmlSerializer(typeof(TimerButton));
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
+        XmlSchema IXmlSerializable.GetSchema()
         {
             return null;
         }
@@ -180,7 +181,7 @@ namespace AGENTIK.Models
         private const string TypeNameElementName = "typename";
         private const string TypeElementName = "type";
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+        XmlSchema IXmlSerializable.GetSchema() {
             return null;
         }
         /// <summary>
@@ -246,7 +247,7 @@ namespace AGENTIK.Models
         private static readonly XmlSerializer ContractorSerializer = new XmlSerializer(typeof(Contractor));
         private static readonly XmlSerializer PrioritySerializer = new XmlSerializer(typeof(Priority));
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+        XmlSchema IXmlSerializable.GetSchema() {
             return null;
         }
         /// <summary>
@@ -289,7 +290,7 @@ namespace AGENTIK.Models
         private const string StatusIDElementName = "status_id";
         private const string StatusNameElementName = "status_name";
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+        XmlSchema IXmlSerializable.GetSchema() {
             return null;
         }
         /// <summary>
@@ -326,7 +327,7 @@ namespace AGENTIK.Models
         private const string ContractorIDElementName = "contractor_id";
         private const string ContractorNameElementName = "contractor_name";
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+        XmlSchema IXmlSerializable.GetSchema() {
             return null;
         }
         /// <summary>
@@ -363,7 +364,7 @@ namespace AGENTIK.Models
         private const string PriorityIDElementName = "priority_id";
         private const string PriorityNameElementName = "priority_name";
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+        XmlSchema IXmlSerializable.GetSchema() {
             return null;
         }
         /// <summary>
@@ -401,7 +402,7 @@ namespace AGENTIK.Models
         private const string IconElementName = "ico";
         private const string MethodElementName = "method";
 
-        System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() {
+        XmlSchema IXmlSerializable.GetSchema() {
             return null;
         }
         /// <summary>

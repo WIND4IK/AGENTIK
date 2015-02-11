@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="HelperChat.Controls.SettingsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ListViewItemTemplate">
+            <TextBlock TextBlock.Text="{Binding Name}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid MinWidth="150" MinHeight="100">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="80" Width="80*" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition MinWidth="200" Width="200*" />
+        </Grid.ColumnDefinitions>
+        <ListView Name="settingsListView" Grid.Column="0" FontFamily="Verdana" ItemTemplate="{StaticResource ListViewItemTemplate}" />
+        <GridSplitter Grid.Column="1" Height="5" HorizontalAlignment="Stretch" />
+        <UserControl Name="control" Grid.Column="2" Content="{Binding SelectedItem.Control,ElementName=settingsListView}" />
+    </Grid>
+
+</UserControl>
